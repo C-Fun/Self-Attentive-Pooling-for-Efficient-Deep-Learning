@@ -237,7 +237,7 @@ if __name__ == '__main__':
 	parser.add_argument('-s','--seed',              default=0,                  type=int,       help='seed for random number')
 	parser.add_argument('--momentum',               default=0.9,                  type=float,       help='mometum of optimizer')
 	parser.add_argument('--amsgrad',               default=True,                  type=bool,       help='amsgrad')
-	parser.add_argument('--dataset',                default='CIFAR10',          type=str,       help='dataset name', choices=['MNIST','CIFAR10','CIFAR100', 'IMAGENET'])
+	parser.add_argument('--dataset',                default='CIFAR10',          type=str,       help='dataset name', choices=['MNIST','CIFAR10','CIFAR100', 'IMAGENET', 'STL10'])
 	parser.add_argument('--batch_size',             default=64,                 type=int,       help='minibatch size')
 	#parser.add_argument('--log',                    action='store_true',                        help='to print the output on terminal or to log file')
 	parser.add_argument('-a','--architecture',      default='VGG16',            type=str,       help='network architecture', choices=['RESNET50', 'RESNET50_LIP', 'RESNET50_NLP', 'RESNET50_MIXP', 'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP'])
@@ -328,6 +328,11 @@ if __name__ == '__main__':
 	elif dataset == 'IMAGENET':
 		normalize   = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
 		labels = 1000
+	elif dataset == 'STL10':
+		normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
+								 std=[0.5, 0.5, 0.5])
+		labels = 10
+
 
 	
 	if dataset == 'CIFAR10' or dataset == 'CIFAR100':
@@ -339,17 +344,17 @@ if __name__ == '__main__':
 		transform_test = transforms.Compose([transforms.ToTensor(), normalize])
 	
 	if dataset == 'CIFAR100':
-		train_dataset   = datasets.CIFAR100(root='./cifar_data', train=True, download=True,transform =transform_train)
-		test_dataset    = datasets.CIFAR100(root='./cifar_data', train=False, download=True, transform=transform_test)
+		train_dataset   = datasets.CIFAR100(root='./data/cifar_data', train=True, download=True,transform =transform_train)
+		test_dataset    = datasets.CIFAR100(root='./data/cifar_data', train=False, download=True, transform=transform_test)
 	
 	elif dataset == 'CIFAR10': 
-		train_dataset   = datasets.CIFAR10(root='./cifar_data', train=True, download=True,transform =transform_train)
-		test_dataset    = datasets.CIFAR10(root='./cifar_data', train=False, download=True, transform=transform_test)
+		train_dataset   = datasets.CIFAR10(root='./data/cifar_data', train=True, download=True,transform =transform_train)
+		test_dataset    = datasets.CIFAR10(root='./data/cifar_data', train=False, download=True, transform=transform_test)
 	
 	elif dataset == 'MNIST':
-		train_dataset   = datasets.MNIST(root='./mnist/', train=True, download=True, transform=transforms.ToTensor()
+		train_dataset   = datasets.MNIST(root='./data/mnist', train=True, download=True, transform=transforms.ToTensor()
 			)
-		test_dataset    = datasets.MNIST(root='./mnist/', train=False, download=True, transform=transforms.ToTensor())
+		test_dataset    = datasets.MNIST(root='./data/mnist', train=False, download=True, transform=transforms.ToTensor())
 	elif dataset == 'IMAGENET':
 		traindir    = os.path.join('/m2/data/imagenet', 'train')
 		valdir      = os.path.join('/m2/data/imagenet', 'val')
@@ -369,9 +374,16 @@ if __name__ == '__main__':
 								transforms.ToTensor(),
 								normalize,
 							]))
+	elif dataset == 'STL10':
+		data_transform = transforms.Compose([
+			transforms.ToTensor(),
+			normalize
+		])
+		train_dataset = datasets.stl10.STL10(root="./data/stl10_data", split="train", download=True, transform=data_transform)
+		test_dataset = datasets.stl10.STL10(root="./data/stl10_data", split="test", download=True, transform=data_transform)
 
 
-	
+
 	train_loader    = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
 	
 	test_loader     = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)

@@ -1,0 +1,4 @@
+/data/
+/trained_models_ann/
+/logs_new/
+*.zip
