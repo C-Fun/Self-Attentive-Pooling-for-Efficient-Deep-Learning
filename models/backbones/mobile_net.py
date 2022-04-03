@@ -113,7 +113,7 @@ class MobileNetV2(BaseModel):
                         layers.append(block(input_channel, output_channel, s, t, conv=self.ConvLayer))
                     else:
                         layers.append(block(input_channel, output_channel, 1, t, conv=self.ConvLayer))
-                        pool2d(output_channel, kernel_size=s, stride=s, patch_size=s, embed_dim=None, num_heads=s)
+                        layers.append(pool2d(output_channel, kernel_size=s, stride=s, patch_size=s, embed_dim=None, num_heads=s))
                 else:
                     layers.append(block(input_channel, output_channel, 1, t, conv=self.ConvLayer))
                 # layers.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv=self.ConvLayer))
