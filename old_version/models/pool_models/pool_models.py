@@ -47,7 +47,7 @@ from einops import rearrange, reduce, repeat
 
 
 class LIP2d(nn.Module):
-	def __init__(self, in_channels, kernel_size=2, stride=2, padding=0, **kwargs):
+	def __init__(self, in_channels, kernel_size=2, stride=2, padding=0):
 		super(LIP2d, self).__init__()
 		self.logit = nn.Sequential(
 					 nn.Conv2d(in_channels, in_channels, kernel_size=1, stride=1, padding=0),

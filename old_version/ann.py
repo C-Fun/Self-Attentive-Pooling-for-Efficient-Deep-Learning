@@ -18,16 +18,16 @@ import pickle
 #from self_models import *
 # from self_models.vgg_tunable_threshold import VGG_TUNABLE_THRESHOLD
 # from self_models.resnet_tunable_threshold import *
-# from models.resnet import ResNet50
-# from models.resnet_lip2d import ResNet50_LIP
-# from models.resnet_nlp2d import ResNet50_NLP
-# from models.resnet_mixp2d import ResNet50_MixedPool
+from models.resnet import ResNet50
+from models.resnet_lip2d import ResNet50_LIP
+from models.resnet_nlp2d import ResNet50_NLP
+from models.resnet_mixp2d import ResNet50_MixedPool
 
-# from models.dyresnet import DyResNet50
-# from models.dyresnet_lip2d import DyResNet50_LIP
-# from models.dyresnet_nlp2d import DyResNet50_NLP
-# from models.dyresnet_mixp2d import DyResNet50_MixedPool
-from models.network import Network
+from models.dyresnet import DyResNet50
+from models.dyresnet_lip2d import DyResNet50_LIP
+from models.dyresnet_nlp2d import DyResNet50_NLP
+from models.dyresnet_mixp2d import DyResNet50_MixedPool
+
 
 class AverageMeter(object):
 	"""Computes and stores the average and current value"""
@@ -240,10 +240,7 @@ if __name__ == '__main__':
 	parser.add_argument('--dataset',                default='CIFAR10',          type=str,       help='dataset name', choices=['MNIST','CIFAR10','CIFAR100', 'IMAGENET', 'STL10'])
 	parser.add_argument('--batch_size',             default=64,                 type=int,       help='minibatch size')
 	#parser.add_argument('--log',                    action='store_true',                        help='to print the output on terminal or to log file')
-	parser.add_argument('-a','--architecture',      default='VGG16',            type=str,       help='network architecture', choices=['RESNET50', 'RESNET50_LIP', 'RESNET50_NLP', 'RESNET50_MIXP', 
-																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP',
-																																	  'MOBILENET', 'MOBILENET_LIP', 'MOBILENET_NLP', 'MOBILENET_MIXP',
-																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP'])
+	parser.add_argument('-a','--architecture',      default='VGG16',            type=str,       help='network architecture', choices=['RESNET50', 'RESNET50_LIP', 'RESNET50_NLP', 'RESNET50_MIXP', 'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP'])
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
 	parser.add_argument('--pretrained_ann',         default='',                 type=str,       help='pretrained model to initialize ANN')
@@ -322,23 +319,19 @@ if __name__ == '__main__':
 	# Loading Dataset
 	if dataset == 'CIFAR100':
 		normalize   = transforms.Normalize((0.5071,0.4867,0.4408),(0.2675,0.2565,0.2761))
-		labels      = 100
-		input_size = 32
+		labels      = 100 
 	elif dataset == 'CIFAR10':
 		normalize   = transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 		labels      = 10
-		input_size = 32
 	elif dataset == 'MNIST':
 		labels = 10
 	elif dataset == 'IMAGENET':
 		normalize   = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
 		labels = 1000
-		input_size = 224
 	elif dataset == 'STL10':
 		normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
 								 std=[0.5, 0.5, 0.5])
 		labels = 10
-		input_size = 96
 
 
 	
@@ -403,28 +396,25 @@ if __name__ == '__main__':
 	#     elif architecture.lower() == 'resnet20':
 	#         model = ResNet20(labels=labels, dropout=dropout, default_threshold=threshold)
 	#     elif architecture.lower() == 'resnet34':
-	#         model = ResNet34(labels=labels, dropout=dropout, default_threshold=threshold)
+	#         model = ResNet34(labels=labels, dropout=dropout, default_threshold=threshold) 
 
+	if architecture.lower() == 'resnet50':
+		model = ResNet50(num_classes=labels)
+	if architecture.lower() == 'resnet50_lip':
+		model = ResNet50_LIP(num_classes=labels)
+	if architecture.lower() == 'resnet50_nlp':
+		model = ResNet50_NLP(num_classes=labels)
+	if architecture.lower() == 'resnet50_mixp':
+		model = ResNet50_MixedPool(num_classes=labels)
 
-	if architecture.lower()[:2] == 'dy':
-		conv_type = 'dynamic'
-	else:
-		conv_type = 'normal'
-
-	if '_lip' in architecture.lower()[-4:]:
-		pool_type = 'lip'
-	elif '_nlp' in architecture.lower()[-4:]:
-		pool_type = 'nlp'
-	elif '_mixp' in architecture.lower()[-5:]:
-		pool_type = 'mixp'
-	else:
-		pool_type = 'none'
-
-	if 'resnet' in architecture.lower():
-		model = Network('resnet50', conv_type, pool_type, pool_strides=[1,2,2,2], num_classes=labels)
-	elif 'mobilenet' in architecture.lower():
-		model = Network('mobilenet', conv_type, pool_type, num_classes=labels, input_size=input_size)
-
+	if architecture.lower() == 'dyresnet50':
+		model = DyResNet50(num_classes=labels)
+	if architecture.lower() == 'dyresnet50_lip':
+		model = DyResNet50_LIP(num_classes=labels)
+	if architecture.lower() == 'dyresnet50_nlp':
+		model = DyResNet50_NLP(num_classes=labels)
+	if architecture.lower() == 'dyresnet50_mixp':
+		model = DyResNet50_MixedPool(num_classes=labels)
 
 	device_ids = list(map(int, args.devices.split(',')))
 	model = nn.DataParallel(model, device_ids=device_ids)
