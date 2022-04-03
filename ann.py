@@ -244,6 +244,7 @@ if __name__ == '__main__':
 																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP',
 																																	  'MOBILENET', 'MOBILENET_LIP', 'MOBILENET_NLP', 'MOBILENET_MIXP',
 																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP'])
+	parser.add_argument('--pool_params', 			default=None,             type=str,       help="pooling methods params setting")
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
 	parser.add_argument('--pretrained_ann',         default='',                 type=str,       help='pretrained model to initialize ANN')
@@ -273,6 +274,7 @@ if __name__ == '__main__':
 	dataset         = args.dataset
 	batch_size      = args.batch_size
 	architecture    = args.architecture
+	pool_params 	= args.pool_params 
 	learning_rate   = args.learning_rate
 	pretrained_ann  = args.pretrained_ann
 	epochs          = args.epochs
@@ -416,10 +418,27 @@ if __name__ == '__main__':
 	else:
 		pool_type = 'none'
 
+	if pool_params==None:
+		pool_params=None
+	else:
+		patch_size, dim_reduced_ratio, num_heads = tuple(map(float, pool_params.split(',')))
+		pool_params = {'patch_size':int(patch_size), 'dim_reduced_ratio':dim_reduced_ratio, 'num_heads':int(num_heads)}
+
 	if 'resnet' in architecture.lower():
-		model = Network('resnet50', conv_type, pool_type, pool_strides=[1,2,2,2], num_classes=labels)
+		pool_strides = [1,2,2,2]
+		model = Network('resnet50', conv_type, pool_type, pool_strides=pool_strides, num_classes=labels, pool_params=pool_params)
 	elif 'mobilenet' in architecture.lower():
-		model = Network('mobilenet', conv_type, pool_type, num_classes=labels)
+		cfgs = [
+                # t(expand_ratio), channel, num, stride (pool_stride)
+                [1,  16, 1, 1],
+                [6,  24, 2, 2],
+                [6,  32, 3, 2],
+                [6,  64, 4, 2],
+                [6,  96, 3, 1],
+                [6, 160, 3, 2],
+                [6, 320, 1, 1],
+            ]
+		model = Network('mobilenet', conv_type, pool_type, num_classes=labels, pool_params=pool_params, cfgs=cfgs)
 
 
 	device_ids = list(map(int, args.devices.split(',')))

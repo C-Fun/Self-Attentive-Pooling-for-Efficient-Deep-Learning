@@ -102,7 +102,8 @@ class ResNet(nn.Module):
 
     def __init__(self, conv2d, pool2d, pool_strides, block, layers, num_classes=1000, zero_init_residual=False,
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
-                 norm_layer=None):
+                 norm_layer=None,
+                 pool_params=None):
         super(ResNet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -119,11 +120,11 @@ class ResNet(nn.Module):
                              "or a 3-element tuple, got {}".format(replace_stride_with_dilation))
         self.groups = groups
         self.base_width = width_per_group
-        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1,
+        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=1,
                                bias=False)
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
-        # self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         
         if pool2d == None:
             self.layer1 = self._make_layer(conv2d, block, 64, layers[0], stride=pool_strides[0])
@@ -137,43 +138,75 @@ class ResNet(nn.Module):
             if pool_strides[0]==1:
                 self.layer1 = self._make_layer(conv2d, block, 64, layers[0], stride=1)
             else:
-                pool_stride = pool_strides[0]
+                s = pool_strides[0]
+                if pool_params == None:
+                    patch_size = s
+                    embed_dim = None
+                    num_heads = s
+                else:
+                    patch_size = pool_params['patch_size']
+                    embed_dim = round(64 * pool_params['dim_reduced_ratio'])
+                    num_heads = pool_params['num_heads']
                 self.layer1 = nn.Sequential(
                     self._make_layer(conv2d, block, 64, layers[0], stride=1),
-                    pool2d(64*block.expansion, kernel_size=pool_stride, stride=pool_stride, patch_size=pool_stride, embed_dim=None, num_heads=pool_stride)
+                    pool2d(64*block.expansion, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads)
                     )
 
             if pool_strides[1]==1:
                 self.layer2 = self._make_layer(conv2d, block, 128, layers[1], stride=1,
                                            dilate=replace_stride_with_dilation[0])
             else:
-                pool_stride = pool_strides[1]
+                s = pool_strides[1]
+                if pool_params == None:
+                    patch_size = s
+                    embed_dim = None
+                    num_heads = s
+                else:
+                    patch_size = pool_params['patch_size']
+                    embed_dim = round(128 * pool_params['dim_reduced_ratio'])
+                    num_heads = pool_params['num_heads']
                 self.layer2 = nn.Sequential(
                     self._make_layer(conv2d, block, 128, layers[1], stride=1,
                                            dilate=replace_stride_with_dilation[0]),
-                    pool2d(128*block.expansion, kernel_size=pool_stride, stride=pool_stride, patch_size=pool_stride, embed_dim=None, num_heads=pool_stride)
+                    pool2d(128*block.expansion, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads)
                     )
 
             if pool_strides[2]==1:
                 self.layer3 = self._make_layer(conv2d, block, 256, layers[2], stride=1,
                                            dilate=replace_stride_with_dilation[1])
             else:
-                pool_stride = pool_strides[2]
+                s = pool_strides[2]
+                if pool_params == None:
+                    patch_size = s
+                    embed_dim = None
+                    num_heads = 2*s
+                else:
+                    patch_size = pool_params['patch_size']
+                    embed_dim = round(256 * pool_params['dim_reduced_ratio'])
+                    num_heads = pool_params['num_heads']
                 self.layer3 = nn.Sequential(
                     self._make_layer(conv2d, block, 256, layers[2], stride=1,
                                            dilate=replace_stride_with_dilation[1]),
-                    pool2d(256*block.expansion, kernel_size=pool_stride, stride=pool_stride, patch_size=pool_stride, embed_dim=None, num_heads=2*pool_stride)
+                    pool2d(256*block.expansion, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads)
                     )
 
             if pool_strides[3]==1:
                 self.layer4 = self._make_layer(conv2d, block, 512, layers[3], stride=1,
                                            dilate=replace_stride_with_dilation[2])
             else:
-                pool_stride = pool_strides[3]
+                s = pool_strides[3]
+                if pool_params == None:
+                    patch_size = s
+                    embed_dim = None
+                    num_heads = 4*s
+                else:
+                    patch_size = pool_params['patch_size']
+                    embed_dim = round(512 * pool_params['dim_reduced_ratio'])
+                    num_heads = pool_params['num_heads']
                 self.layer4 = nn.Sequential(
                     self._make_layer(conv2d, block, 512, layers[3], stride=1,
                                            dilate=replace_stride_with_dilation[2]),
-                    pool2d(512*block.expansion, kernel_size=pool_stride, stride=pool_stride, patch_size=pool_stride, embed_dim=None, num_heads=4*pool_stride)
+                    pool2d(512*block.expansion, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads)
                     )
 
 
@@ -232,7 +265,7 @@ class ResNet(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
-        # x = self.maxpool(x)
+        x = self.maxpool(x)
 
         x1 = self.layer1(x)
         x2 = self.layer2(x1)

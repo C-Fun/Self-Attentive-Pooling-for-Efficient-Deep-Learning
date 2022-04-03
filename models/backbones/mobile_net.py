@@ -86,19 +86,22 @@ class InvertedResidual(TempModule):
 
 
 class MobileNetV2(BaseModel):
-    def __init__(self, conv2d, pool2d, num_classes=200, width_multiplier=0.35):
+    def __init__(self, conv2d, pool2d, pool_params=None, num_classes=200, width_multiplier=0.35, cfgs=None):
         super(MobileNetV2, self).__init__(conv2d)
         # setting of inverted residual blocks
-        self.cfgs = [
-            # t, c, n, s
-            [1,  16, 1, 1],
-            [6,  24, 2, 2],
-            [6,  32, 3, 2],
-            [6,  64, 4, 2],
-            [6,  96, 3, 1],
-            [6, 160, 3, 2],
-            [6, 320, 1, 1],
-        ]
+        if cfgs==None:
+            self.cfgs = [
+                # t, c, n, s
+                [1,  16, 1, 1],
+                [6,  24, 2, 2],
+                [6,  32, 3, 2],
+                [6,  64, 4, 2],
+                [6,  96, 3, 1],
+                [6, 160, 3, 2],
+                [6, 320, 1, 1],
+            ]
+        else:
+            self.cfgs = cfgs
 
         # building first layer
         input_channel = _make_divisible(32 * width_multiplier, 4 if width_multiplier == 0.1 else 8)
@@ -113,7 +116,15 @@ class MobileNetV2(BaseModel):
                         layers.append(block(input_channel, output_channel, s, t, conv=self.ConvLayer))
                     else:
                         layers.append(block(input_channel, output_channel, 1, t, conv=self.ConvLayer))
-                        layers.append(pool2d(output_channel, kernel_size=s, stride=s, patch_size=s, embed_dim=None, num_heads=s))
+                        if pool_params==None:
+                            patch_size = s
+                            embed_dim = None
+                            num_heads = s
+                        else:
+                            patch_size = pool_params['patch_size']
+                            embed_dim = round(c * pool_params['dim_reduced_ratio'])
+                            num_heads = pool_params['num_heads']
+                        layers.append(pool2d(output_channel, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads))
                 else:
                     layers.append(block(input_channel, output_channel, 1, t, conv=self.ConvLayer))
                 # layers.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv=self.ConvLayer))
