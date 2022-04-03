@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import math
 
-from ..utils.common import BaseModel, CustomSequential
-from ..utils.dynamic_conv import DynamicConvolution, TempModule, dynamic_convolution_generator
+from ..utils.common import BaseModel, TempModule, CustomSequential
+from ..utils.dynamic_conv import DynamicConvolution, dynamic_convolution_generator
 
 
 __all__ = ['mobilenetv2', 'MobileNetV2']
@@ -162,9 +162,9 @@ def mobilenetv2(conv2d, pool2d, pretrained=False, pth_file=None, **kwargs):
     return MobileNetV2(conv2d, pool2d, **kwargs)
 
 
-if __name__ == '__main__':
-    x = torch.rand(1, 3, 64, 64)
-    conv_layer = dynamic_convolution_generator(4, 4)
-    model = MobileNetV2(conv_layer)
-    x = model(x, 30)
-    print(x.size())
+# if __name__ == '__main__':
+#     x = torch.rand(1, 3, 64, 64)
+#     conv_layer = dynamic_convolution_generator(4, 4)
+#     model = MobileNetV2(conv_layer)
+#     x = model(x, 30)
+#     print(x.size())
