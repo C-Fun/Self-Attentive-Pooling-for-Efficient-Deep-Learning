@@ -3,3 +3,4 @@
 /logs_new/
 /check_points/
 *.zip
+*.pyc
