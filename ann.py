@@ -14,19 +14,7 @@ import os
 import numpy as np
 import json
 import pickle
-#from data_prep import *
-#from self_models import *
-# from self_models.vgg_tunable_threshold import VGG_TUNABLE_THRESHOLD
-# from self_models.resnet_tunable_threshold import *
-# from models.resnet import ResNet50
-# from models.resnet_lip2d import ResNet50_LIP
-# from models.resnet_nlp2d import ResNet50_NLP
-# from models.resnet_mixp2d import ResNet50_MixedPool
 
-# from models.dyresnet import DyResNet50
-# from models.dyresnet_lip2d import DyResNet50_LIP
-# from models.dyresnet_nlp2d import DyResNet50_NLP
-# from models.dyresnet_mixp2d import DyResNet50_MixedPool
 from models.network import Network
 
 class AverageMeter(object):
@@ -244,9 +232,10 @@ if __name__ == '__main__':
 																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP',
 																																	  'MOBILENET', 'MOBILENET_LIP', 'MOBILENET_NLP', 'MOBILENET_MIXP',
 																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP'])
-	parser.add_argument('--pool_params', 			default=None,             type=str,       help="pooling methods params setting")
+	parser.add_argument('--pool_params', 			default='',             type=str,       help="pooling methods params setting")
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
+	parser.add_argument('--pretrained_backbone',         default='',                 type=str,       help='pretrained model to initialize Backbone')
 	parser.add_argument('--pretrained_ann',         default='',                 type=str,       help='pretrained model to initialize ANN')
 	parser.add_argument('--weight_decay',           default=0.000,               type=float,       help='weight_decay')
 	parser.add_argument('--test_only',              action='store_true',                        help='perform only inference')
@@ -274,7 +263,6 @@ if __name__ == '__main__':
 	dataset         = args.dataset
 	batch_size      = args.batch_size
 	architecture    = args.architecture
-	pool_params 	= args.pool_params 
 	learning_rate   = args.learning_rate
 	pretrained_ann  = args.pretrained_ann
 	epochs          = args.epochs
@@ -335,17 +323,17 @@ if __name__ == '__main__':
 		labels = 1000
 	elif dataset == 'STL10':
 		normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
-								 std=[0.5, 0.5, 0.5])
+								 		 std=[0.5, 0.5, 0.5])
 		labels = 10
 
 
 	
 	if dataset == 'CIFAR10' or dataset == 'CIFAR100':
 		transform_train = transforms.Compose([
-		transforms.RandomCrop(32, padding=4),
-		transforms.RandomHorizontalFlip(),
-		transforms.ToTensor(),
-		normalize])
+						  transforms.RandomCrop(32, padding=4),
+						  transforms.RandomHorizontalFlip(),
+						  transforms.ToTensor(),
+						  normalize])
 		transform_test = transforms.Compose([transforms.ToTensor(), normalize])
 	
 	if dataset == 'CIFAR100':
@@ -360,6 +348,7 @@ if __name__ == '__main__':
 		train_dataset   = datasets.MNIST(root='./data/mnist', train=True, download=True, transform=transforms.ToTensor()
 			)
 		test_dataset    = datasets.MNIST(root='./data/mnist', train=False, download=True, transform=transforms.ToTensor())
+	
 	elif dataset == 'IMAGENET':
 		traindir    = os.path.join('/m2/data/imagenet', 'train')
 		valdir      = os.path.join('/m2/data/imagenet', 'val')
@@ -379,14 +368,21 @@ if __name__ == '__main__':
 								transforms.ToTensor(),
 								normalize,
 							]))
+	
 	elif dataset == 'STL10':
-		data_transform = transforms.Compose([
-			transforms.ToTensor(),
-			normalize
-		])
-		train_dataset = datasets.stl10.STL10(root="./data/stl10_data", split="train", download=True, transform=data_transform)
-		test_dataset = datasets.stl10.STL10(root="./data/stl10_data", split="test", download=True, transform=data_transform)
-
+		transform_train = transforms.Compose([
+						  transforms.RandomResizedCrop(96),
+						  transforms.RandomHorizontalFlip(),
+						  transforms.ToTensor(),
+						  normalize])
+		transform_test = transforms.Compose([
+						 transforms.Resize(96),
+						 transforms.CenterCrop(96),
+						 transforms.ToTensor(),
+						 normalize,
+						 ])
+		train_dataset = datasets.stl10.STL10(root="./data/stl10_data", split="train", download=True, transform=transform_train)
+		test_dataset = datasets.stl10.STL10(root="./data/stl10_data", split="test", download=True, transform=transform_test)
 
 
 	train_loader    = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
@@ -418,15 +414,22 @@ if __name__ == '__main__':
 	else:
 		pool_type = 'none'
 
-	if pool_params==None:
-		pool_params=None
-	else:
-		patch_size, dim_reduced_ratio, num_heads = tuple(map(float, pool_params.split(',')))
+	if args.pool_params:
+		patch_size, dim_reduced_ratio, num_heads = tuple(map(float, args.pool_params.split(',')))
 		pool_params = {'patch_size':int(patch_size), 'dim_reduced_ratio':dim_reduced_ratio, 'num_heads':int(num_heads)}
+	else:
+		pool_params = None
 
-	if 'resnet' in architecture.lower():
+	if args.pretrained_backbone:
+		pretrained = True
+		pth_file = args.pretrained_backbone
+	else:
+		pretrained = False
+		pth_file = None
+
+	if 'resnet50' in architecture.lower():
 		pool_strides = [1,2,2,2]
-		model = Network('resnet50', conv_type, pool_type, pool_strides=pool_strides, num_classes=labels, pool_params=pool_params)
+		model = Network('resnet50', conv_type, pool_type, pool_strides=pool_strides, num_classes=labels, pool_params=pool_params, pretrained=pretrained, pth_file=pth_file)
 	elif 'mobilenet' in architecture.lower():
 		cfgs = [
                 # t(expand_ratio), channel, num, stride (pool_stride)
@@ -438,7 +441,7 @@ if __name__ == '__main__':
                 [6, 160, 3, 2],
                 [6, 320, 1, 1],
             ]
-		model = Network('mobilenet', conv_type, pool_type, num_classes=labels, pool_params=pool_params, cfgs=cfgs)
+		model = Network('mobilenet', conv_type, pool_type, num_classes=labels, pool_params=pool_params, cfgs=cfgs, pretrained=pretrained, pth_file=pth_file)
 
 
 	device_ids = list(map(int, args.devices.split(',')))

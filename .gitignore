@@ -1,4 +1,5 @@
 /data/
 /trained_models_ann/
 /logs_new/
+/check_points/
 *.zip

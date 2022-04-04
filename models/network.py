@@ -4,7 +4,6 @@ import torch.nn as nn
 from .backbones.resnet import resnet50
 from .backbones.mobile_net import mobilenetv2
 
-# from .dynamic_models.dynamic_conv import Dynamic_conv2d
 from .utils.dynamic_conv import dynamic_convolution_generator
 from .utils.pool_models import LIP2d, NLP2d, MixedPool
 
