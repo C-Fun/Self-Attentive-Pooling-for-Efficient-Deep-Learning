@@ -146,9 +146,9 @@ class ResNet(nn.Module):
             else:
                 s = pool_strides[0]
                 if pool_params == None:
-                    patch_size = s
+                    patch_size = 1
                     embed_dim = None
-                    num_heads = s
+                    num_heads = 2
                 else:
                     patch_size = pool_params['patch_size']
                     embed_dim = round(64 * pool_params['dim_reduced_ratio'])
@@ -164,9 +164,9 @@ class ResNet(nn.Module):
             else:
                 s = pool_strides[1]
                 if pool_params == None:
-                    patch_size = s
+                    patch_size = 1
                     embed_dim = None
-                    num_heads = s
+                    num_heads = 2
                 else:
                     patch_size = pool_params['patch_size']
                     embed_dim = round(128 * pool_params['dim_reduced_ratio'])
@@ -183,9 +183,9 @@ class ResNet(nn.Module):
             else:
                 s = pool_strides[2]
                 if pool_params == None:
-                    patch_size = s
+                    patch_size = 1
                     embed_dim = None
-                    num_heads = 2*s
+                    num_heads = 4
                 else:
                     patch_size = pool_params['patch_size']
                     embed_dim = round(256 * pool_params['dim_reduced_ratio'])
@@ -202,9 +202,9 @@ class ResNet(nn.Module):
             else:
                 s = pool_strides[3]
                 if pool_params == None:
-                    patch_size = s
+                    patch_size = 1
                     embed_dim = None
-                    num_heads = 4*s
+                    num_heads = 8
                 else:
                     patch_size = pool_params['patch_size']
                     embed_dim = round(512 * pool_params['dim_reduced_ratio'])

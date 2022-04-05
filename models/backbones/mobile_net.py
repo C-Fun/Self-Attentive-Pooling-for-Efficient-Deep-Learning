@@ -117,9 +117,9 @@ class MobileNetV2(BaseModel):
                     else:
                         layers.append(block(input_channel, output_channel, 1, t, conv=self.ConvLayer))
                         if pool_params==None:
-                            patch_size = s
+                            patch_size = 1
                             embed_dim = None
-                            num_heads = s
+                            num_heads = 2
                         else:
                             patch_size = pool_params['patch_size']
                             embed_dim = round(c * pool_params['dim_reduced_ratio'])
