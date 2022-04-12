@@ -100,10 +100,9 @@ __all__ = ['ResNet', 'resnet50']
 
 class ResNet(nn.Module):
 
-    def __init__(self, conv2d, pool2d, pool_strides, block, layers, num_classes=1000, zero_init_residual=False,
+    def __init__(self, cfg, block, layers, num_classes=1000, zero_init_residual=False,
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
-                 norm_layer=None,
-                 pool_params=None):
+                 norm_layer=None):
         super(ResNet, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
@@ -121,103 +120,54 @@ class ResNet(nn.Module):
         self.groups = groups
         self.base_width = width_per_group
 
-        self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=1,
+        self.conv1 = cfg.conv1[0](3, self.inplanes, kernel_size=cfg.conv1[1], stride=cfg.conv1[2], padding=cfg.conv1[3],
                                bias=False)
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        if cfg.pool1 == None:
+            self.pool1 = None
+        else:
+            try:
+                self.pool1 = cfg.pool1[0](kernel_size=cfg.pool1[1], stride=cfg.pool1[2], padding=cfg.pool1[3])
+            except:
+                self.pool1 = cfg.pool1[0](self.inplanes, kernel_size=cfg.pool1[1], stride=cfg.pool1[2], padding=cfg.pool1[3])
 
         # self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=3, stride=1, padding=1,
         #                        bias=False)
         # self.bn1 = norm_layer(self.inplanes)
         # self.relu = nn.ReLU(inplace=True)
 
-        if pool2d == None:
-            self.layer1 = self._make_layer(conv2d, block, 64, layers[0], stride=pool_strides[0])
-            self.layer2 = self._make_layer(conv2d, block, 128, layers[1], stride=pool_strides[1],
-                                           dilate=replace_stride_with_dilation[0])
-            self.layer3 = self._make_layer(conv2d, block, 256, layers[2], stride=pool_strides[2],
-                                           dilate=replace_stride_with_dilation[1])
-            self.layer4 = self._make_layer(conv2d, block, 512, layers[3], stride=pool_strides[3],
-                                           dilate=replace_stride_with_dilation[2])
+        self.layers = []
+        chs = [64, 128, 256, 512]
+        pool_params = cfg._poolparams
+        if pool_params == None:
+            strides = [1, 2, 2, 2]
+            for i, ch in enumerate(chs):
+                self.layers.append(self._make_layer(cfg.conv2d, block, ch, layers[i], stride=strides[i]))
         else:
-            if pool_strides[0]==1:
-                self.layer1 = self._make_layer(conv2d, block, 64, layers[0], stride=1)
-            else:
-                s = pool_strides[0]
-                if pool_params == None:
-                    patch_size = 1
-                    embed_dim = None
-                    num_heads = 2
-                else:
-                    patch_size = pool_params['patch_size']
-                    embed_dim = round(64 * pool_params['dim_reduced_ratio'])
-                    num_heads = pool_params['num_heads']
-                self.layer1 = nn.Sequential(
-                    self._make_layer(conv2d, block, 64, layers[0], stride=1),
-                    pool2d(64*block.expansion, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads)
-                    )
+            for i, ch in enumerate(chs):
+                pool_param = pool_params[i]
+                pool2d = pool_param['pool2d']
+                stride = pool_param['stride']
 
-            if pool_strides[1]==1:
-                self.layer2 = self._make_layer(conv2d, block, 128, layers[1], stride=1,
-                                           dilate=replace_stride_with_dilation[0])
-            else:
-                s = pool_strides[1]
-                if pool_params == None:
-                    patch_size = 1
-                    embed_dim = None
-                    num_heads = 2
+                if pool2d==None:
+                    self.layers.append(self._make_layer(cfg.conv2d, block, ch, layers[i], stride=stride))
                 else:
-                    patch_size = pool_params['patch_size']
-                    embed_dim = round(128 * pool_params['dim_reduced_ratio'])
-                    num_heads = pool_params['num_heads']
-                self.layer2 = nn.Sequential(
-                    self._make_layer(conv2d, block, 128, layers[1], stride=1,
-                                           dilate=replace_stride_with_dilation[0]),
-                    pool2d(128*block.expansion, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads)
-                    )
-
-            if pool_strides[2]==1:
-                self.layer3 = self._make_layer(conv2d, block, 256, layers[2], stride=1,
-                                           dilate=replace_stride_with_dilation[1])
-            else:
-                s = pool_strides[2]
-                if pool_params == None:
-                    patch_size = 1
-                    embed_dim = None
-                    num_heads = 4
-                else:
-                    patch_size = pool_params['patch_size']
-                    embed_dim = round(256 * pool_params['dim_reduced_ratio'])
-                    num_heads = pool_params['num_heads']
-                self.layer3 = nn.Sequential(
-                    self._make_layer(conv2d, block, 256, layers[2], stride=1,
-                                           dilate=replace_stride_with_dilation[1]),
-                    pool2d(256*block.expansion, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads)
-                    )
-
-            if pool_strides[3]==1:
-                self.layer4 = self._make_layer(conv2d, block, 512, layers[3], stride=1,
-                                           dilate=replace_stride_with_dilation[2])
-            else:
-                s = pool_strides[3]
-                if pool_params == None:
-                    patch_size = 1
-                    embed_dim = None
-                    num_heads = 8
-                else:
-                    patch_size = pool_params['patch_size']
-                    embed_dim = round(512 * pool_params['dim_reduced_ratio'])
-                    num_heads = pool_params['num_heads']
-                self.layer4 = nn.Sequential(
-                    self._make_layer(conv2d, block, 512, layers[3], stride=1,
-                                           dilate=replace_stride_with_dilation[2]),
-                    pool2d(512*block.expansion, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads)
-                    )
-
+                    ksize = pool_param['ksize']
+                    psize = pool_param['psize']
+                    dim_ratio = pool_param['dim_reduced_ratio']
+                    if dim_ratio == None:
+                        embed_dim = None
+                    else:
+                        embed_dim = round(ch * dim_ratio)
+                    num_heads = pool_param['num_heads']
+                    self.layers.append(nn.Sequential(
+                                  self._make_layer(cfg.conv2d, block, ch, layers[i], stride=1),
+                                  pool2d(ch*block.expansion, kernel_size=ksize, stride=stride, patch_size=psize, embed_dim=embed_dim, num_heads=num_heads)
+                                ))
 
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(chs[-1] * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -271,12 +221,13 @@ class ResNet(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
-        x = self.maxpool(x)
+        if self.pool1 != None:
+            x = self.pool1(x)
 
-        x1 = self.layer1(x)
-        x2 = self.layer2(x1)
-        x3 = self.layer3(x2)
-        x4 = self.layer4(x3)
+        x1 = self.layers[0](x)
+        x2 = self.layers[1](x1)
+        x3 = self.layers[2](x2)
+        x4 = self.layers[3](x3)
 
         y = self.avgpool(x4)
         y = torch.flatten(y, 1)
@@ -288,8 +239,8 @@ class ResNet(nn.Module):
         return self._forward_impl(x)
 
 
-def _resnet(arch, conv2d, pool2d, pool_strides, block, layers, pretrained, pth_file, **kwargs):
-    model = ResNet(conv2d, pool2d, pool_strides, block, layers, **kwargs)
+def _resnet(arch, cfg, block, layers, pretrained, pth_file, **kwargs):
+    model = ResNet(cfg, block, layers, **kwargs)
     if pretrained:
         pretrained_resnet = torch.load(pth_file)
         model_dict = model.state_dict()
@@ -310,7 +261,7 @@ def _resnet(arch, conv2d, pool2d, pool_strides, block, layers, pretrained, pth_f
     return model
 
 
-def resnet50(conv2d, pool2d, pool_strides=[1,2,2,2], pretrained=False, pth_file=None, **kwargs):
+def resnet50(cfg, pretrained=False, pth_file=None, **kwargs):
     r"""ResNet-50 model from
     `"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
 
@@ -318,5 +269,5 @@ def resnet50(conv2d, pool2d, pool_strides=[1,2,2,2], pretrained=False, pth_file=
         pretrained (bool): If True, returns a model pre-trained on ImageNet
         pth_file (string): .pth file path
     """
-    return _resnet('resnet50', conv2d, pool2d, pool_strides, Bottleneck, [3, 4, 6, 3], pretrained, pth_file,
+    return _resnet('resnet50', cfg, Bottleneck, [3, 4, 6, 3], pretrained, pth_file,
                    **kwargs)

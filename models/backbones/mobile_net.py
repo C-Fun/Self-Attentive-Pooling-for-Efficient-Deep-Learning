@@ -29,17 +29,24 @@ def _make_divisible(v, divisor, min_value=None):
     return new_v
 
 
-def conv_3x3_bn(inp, oup, stride, conv=nn.Conv2d):
-    return CustomSequential(
-        conv(inp, oup, 3, stride, 1, bias=False),
-        nn.BatchNorm2d(oup),
-        nn.ReLU6(inplace=True)
-    )
+# def conv_3x3_bn(inp, oup, stride, conv=nn.Conv2d):
+#     return CustomSequential(
+#         conv(inp, oup, 3, stride, 1, bias=False),
+#         nn.BatchNorm2d(oup),
+#         nn.ReLU6(inplace=True)
+#     )
 
 
-def conv_1x1_bn(inp, oup, conv=nn.Conv2d):
+# def conv_1x1_bn(inp, oup, conv=nn.Conv2d):
+#     return CustomSequential(
+#         conv(inp, oup, 1, 1, 0, bias=False),
+#         nn.BatchNorm2d(oup),
+#         nn.ReLU6(inplace=True)
+#     )
+
+def conv_bn(inp, oup, ksize, stride, padding, conv=nn.Conv2d):
     return CustomSequential(
-        conv(inp, oup, 1, 1, 0, bias=False),
+        conv(inp, oup, ksize, stride, padding, bias=False),
         nn.BatchNorm2d(oup),
         nn.ReLU6(inplace=True)
     )
@@ -86,53 +93,59 @@ class InvertedResidual(TempModule):
 
 
 class MobileNetV2(BaseModel):
-    def __init__(self, conv2d, pool2d, pool_params=None, num_classes=200, width_multiplier=0.35, cfgs=None):
-        super(MobileNetV2, self).__init__(conv2d)
+    def __init__(self, cfg, num_classes=200, width_multiplier=0.35, cfgs=None):
+        super(MobileNetV2, self).__init__(cfg.conv2d)
         # setting of inverted residual blocks
-        if cfgs==None:
-            self.cfgs = [
-                # t, c, n, s
-                [1,  16, 1, 1],
-                [6,  24, 2, 2],
-                [6,  32, 3, 2],
-                [6,  64, 4, 2],
-                [6,  96, 3, 1],
-                [6, 160, 3, 2],
-                [6, 320, 1, 1],
-            ]
-        else:
-            self.cfgs = cfgs
+        # self.cfgs = [
+        #     # t, c, n, s
+        #     [1,  16, 1, 1],
+        #     [6,  24, 2, 2],
+        #     [6,  32, 3, 2],
+        #     [6,  64, 4, 2],
+        #     [6,  96, 3, 1],
+        #     [6, 160, 3, 2],
+        #     [6, 320, 1, 1],
+        # ]
+        self.cfgs = cfg._convparams
+        pool_params = cfg._poolparams
 
         # building first layer
         input_channel = _make_divisible(32 * width_multiplier, 4 if width_multiplier == 0.1 else 8)
-        layers = [conv_3x3_bn(3, input_channel, 2, conv=nn.Conv2d)]
+        layers = [conv_bn(3, input_channel, cfg.conv1[1], cfg.conv1[2], cfg.conv1[3], conv=cfg.conv1[0])]
         # building inverted residual blocks
         block = InvertedResidual
-        for t, c, n, s in self.cfgs:
+        for idx, (t, c, n, s) in enumerate(self.cfgs):
             output_channel = _make_divisible(c * width_multiplier, 4 if width_multiplier == 0.1 else 8)
             for i in range(n):
-                if i==0:
-                    if s==1 or pool2d==None:
-                        layers.append(block(input_channel, output_channel, s, t, conv=self.ConvLayer))
+                if pool_params == None:
+                    layers.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv=self.ConvLayer))
+                else:
+                    pool_param = pool_params[idx]
+                    pool2d = pool_param['pool2d']
+                    stride = pool_param['stride']
+                    if i==0:
+                        if pool2d==None:
+                            layers.append(block(input_channel, output_channel, stride, t, conv=self.ConvLayer))
+                        else:
+                            layers.append(block(input_channel, output_channel, 1, t, conv=self.ConvLayer))
+
+                            ksize = pool_param['ksize']
+                            psize = pool_param['psize']
+                            dim_ratio = pool_param['dim_reduced_ratio']
+                            if dim_ratio == None:
+                                embed_dim = None
+                            else:
+                                embed_dim = round(c * dim_ratio)
+                            num_heads = pool_param['num_heads']
+                            layers.append(pool2d(output_channel, kernel_size=ksize, stride=stride, patch_size=psize, embed_dim=embed_dim, num_heads=num_heads))
                     else:
                         layers.append(block(input_channel, output_channel, 1, t, conv=self.ConvLayer))
-                        if pool_params==None:
-                            patch_size = 1
-                            embed_dim = None
-                            num_heads = 2
-                        else:
-                            patch_size = pool_params['patch_size']
-                            embed_dim = round(c * pool_params['dim_reduced_ratio'])
-                            num_heads = pool_params['num_heads']
-                        layers.append(pool2d(output_channel, kernel_size=s, stride=s, patch_size=patch_size, embed_dim=embed_dim, num_heads=num_heads))
-                else:
-                    layers.append(block(input_channel, output_channel, 1, t, conv=self.ConvLayer))
-                # layers.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv=self.ConvLayer))
+                
                 input_channel = output_channel
         self.features = CustomSequential(*layers)
         # building last several layers
         output_channel = _make_divisible(1280 * width_multiplier, 4 if width_multiplier == 0.1 else 8) if width_multiplier > 1.0 else 1280
-        self.conv = conv_1x1_bn(input_channel, output_channel, conv=self.ConvLayer)
+        self.conv = conv_bn(input_channel, output_channel, 1, 1, 0, conv=self.ConvLayer)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.classifier = nn.Linear(output_channel, num_classes)
 
@@ -166,11 +179,11 @@ class MobileNetV2(BaseModel):
                 m.weight.data.normal_(0, 0.01)
                 m.bias.data.zero_()
 
-def mobilenetv2(conv2d, pool2d, pretrained=False, pth_file=None, **kwargs):
+def mobilenetv2(cfg, pretrained=False, pth_file=None, **kwargs):
     """
     Constructs a MobileNet V2 model
     """
-    return MobileNetV2(conv2d, pool2d, **kwargs)
+    return MobileNetV2(cfg, **kwargs)
 
 
 # if __name__ == '__main__':

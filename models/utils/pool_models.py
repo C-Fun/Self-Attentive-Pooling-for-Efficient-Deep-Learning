@@ -64,7 +64,7 @@ class LIP2d(nn.Module):
 
 
 class NLP2d(nn.Module):
-	def __init__(self, in_channels, kernel_size=2, stride=2, patch_size=2, embed_dim=None, num_heads=2):
+	def __init__(self, in_channels, kernel_size=2, stride=2, padding=0, patch_size=2, embed_dim=None, num_heads=2):
 		super(NLP2d, self).__init__()
 
 		self.patch_size = patch_size;
@@ -92,7 +92,7 @@ class NLP2d(nn.Module):
 					nn.Sigmoid()
 				)
 
-		self.pool = nn.AvgPool2d(kernel_size=kernel_size, stride=stride)
+		self.pool = nn.AvgPool2d(kernel_size=kernel_size, stride=stride, padding=padding)
 
 	def forward(self, x):
 		b,c,h,w = x.shape
@@ -122,7 +122,7 @@ class NLP2d(nn.Module):
 
 
 class MixedPool(nn.Module):
-	def __init__(self, in_channels, kernel_size=2, stride=2, patch_size=2, embed_dim=None, num_heads=2):
+	def __init__(self, in_channels, kernel_size=2, stride=2, padding=0, patch_size=2, embed_dim=None, num_heads=2):
 		super(MixedPool, self).__init__()
 
 		self.patch_size = patch_size;
@@ -150,7 +150,7 @@ class MixedPool(nn.Module):
 					nn.Sigmoid()
 				)
 
-		self.pool = nn.AvgPool2d(kernel_size=kernel_size, stride=stride)
+		self.pool = nn.AvgPool2d(kernel_size=kernel_size, stride=stride, padding=padding)
 
 	def forward(self, x):
 		b,c,h,w = x.shape
@@ -180,7 +180,7 @@ class MixedPool(nn.Module):
 
 if __name__ == '__main__':
 	x = torch.randn(2, 512, 123, 233).cuda()
-	model = MultiheadAttnPool(512, kernel_size=2, stride=2, patch_size=16, embed_dim=16, num_heads=2).cuda()
+	model = MultiheadAttnPool(512, kernel_size=2, stride=2, padding=0, patch_size=16, embed_dim=16, num_heads=2).cuda()
 
 	# x = x.to('cuda:0')
 	# model.to('cuda')

@@ -227,12 +227,12 @@ if __name__ == '__main__':
 	parser.add_argument('--amsgrad',               default=True,                  type=bool,       help='amsgrad')
 	parser.add_argument('--dataset',                default='CIFAR10',          type=str,       help='dataset name', choices=['MNIST','CIFAR10','CIFAR100', 'IMAGENET', 'STL10'])
 	parser.add_argument('--batch_size',             default=64,                 type=int,       help='minibatch size')
-	#parser.add_argument('--log',                    action='store_true',                        help='to print the output on terminal or to log file')
+	# parser.add_argument('--log',                    action='store_true',                        help='to print the output on terminal or to log file')
 	parser.add_argument('-a','--architecture',      default='VGG16',            type=str,       help='network architecture', choices=['RESNET50', 'RESNET50_LIP', 'RESNET50_NLP', 'RESNET50_MIXP', 
 																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP',
 																																	  'MOBILENET', 'MOBILENET_LIP', 'MOBILENET_NLP', 'MOBILENET_MIXP',
-																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP'])
-	parser.add_argument('--pool_params', 			default='',             type=str,       help="pooling methods params setting")
+																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP',
+																																	  'RESNET50_LIP2222', 'RESNET50_NLP2222', 'RESNET50_NLP_MAXPOOL2NLP'])
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
 	parser.add_argument('--pretrained_backbone',         default='',                 type=str,       help='pretrained model to initialize Backbone')
@@ -339,7 +339,7 @@ if __name__ == '__main__':
 	if dataset == 'CIFAR100':
 		train_dataset   = datasets.CIFAR100(root='./data/cifar_data', train=True, download=True,transform =transform_train)
 		test_dataset    = datasets.CIFAR100(root='./data/cifar_data', train=False, download=True, transform=transform_test)
-	
+
 	elif dataset == 'CIFAR10': 
 		train_dataset   = datasets.CIFAR10(root='./data/cifar_data', train=True, download=True,transform =transform_train)
 		test_dataset    = datasets.CIFAR10(root='./data/cifar_data', train=False, download=True, transform=transform_test)
@@ -400,26 +400,6 @@ if __name__ == '__main__':
 	#         model = ResNet34(labels=labels, dropout=dropout, default_threshold=threshold)
 
 
-	if architecture.lower()[:2] == 'dy':
-		conv_type = 'dynamic'
-	else:
-		conv_type = 'normal'
-
-	if '_lip' in architecture.lower()[-4:]:
-		pool_type = 'lip'
-	elif '_nlp' in architecture.lower()[-4:]:
-		pool_type = 'nlp'
-	elif '_mixp' in architecture.lower()[-5:]:
-		pool_type = 'mixp'
-	else:
-		pool_type = 'none'
-
-	if args.pool_params:
-		patch_size, dim_reduced_ratio, num_heads = tuple(map(float, args.pool_params.split(',')))
-		pool_params = {'patch_size':int(patch_size), 'dim_reduced_ratio':dim_reduced_ratio, 'num_heads':int(num_heads)}
-	else:
-		pool_params = None
-
 	if args.pretrained_backbone:
 		pretrained = True
 		pth_file = args.pretrained_backbone
@@ -427,22 +407,32 @@ if __name__ == '__main__':
 		pretrained = False
 		pth_file = None
 
-	if 'resnet50' in architecture.lower():
-		pool_strides = [1,2,2,2]
-		model = Network('resnet50', conv_type, pool_type, pool_strides=pool_strides, num_classes=labels, pool_params=pool_params, pretrained=pretrained, pth_file=pth_file)
-	elif 'mobilenet' in architecture.lower():
-		cfgs = [
-                # t(expand_ratio), channel, num, stride (pool_stride)
-                [1,  16, 1, 1],
-                [6,  24, 2, 2],
-                [6,  32, 3, 2],
-                [6,  64, 4, 2],
-                [6,  96, 3, 1],
-                [6, 160, 3, 2],
-                [6, 320, 1, 1],
-            ]
-		model = Network('mobilenet', conv_type, pool_type, num_classes=labels, pool_params=pool_params, cfgs=cfgs, pretrained=pretrained, pth_file=pth_file)
+	if args.architecture.lower() == "resnet50":
+		from configs._base import resnet as cfg
+	if args.architecture.lower() == "resnet50_lip":
+		from configs import resnet_lip as cfg
+	if args.architecture.lower() == "resnet50_nlp":
+		from configs import resnet_nlp as cfg
+	if args.architecture.lower() == "resnet50_mixp":
+		from configs import resnet_mixp as cfg
 
+	if args.architecture.lower() == "mobilenet":
+		from configs._base import mobilenet as cfg
+	if args.architecture.lower() == "mobilenet_lip":
+		from configs import mobilenet_lip as cfg
+	if args.architecture.lower() == "mobilenet_nlp":
+		from configs import mobilenet_nlp as cfg
+	if args.architecture.lower() == "mobilenet_mixp":
+		from configs import mobilenet_mixp as cfg
+
+	if args.architecture.lower() == "resnet50_lip2222":
+		from configs import resnet_lip2222 as cfg
+	if args.architecture.lower() == "resnet50_nlp2222":
+		from configs import resnet_nlp2222 as cfg
+	if args.architecture.lower() == "resnet50_nlp_maxpool2nlp":
+		from configs import resnet_nlp_maxpool2nlp as cfg
+
+	model = Network(cfg, num_classes=labels, pretrained=pretrained, pth_file=pth_file)
 
 	device_ids = list(map(int, args.devices.split(',')))
 	model = nn.DataParallel(model, device_ids=device_ids)
