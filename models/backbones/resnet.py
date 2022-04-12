@@ -137,13 +137,13 @@ class ResNet(nn.Module):
         # self.bn1 = norm_layer(self.inplanes)
         # self.relu = nn.ReLU(inplace=True)
 
-        self.layers = []
+        res_layers = []
         chs = [64, 128, 256, 512]
         pool_params = cfg._poolparams
         if pool_params == None:
             strides = [1, 2, 2, 2]
             for i, ch in enumerate(chs):
-                self.layers.append(self._make_layer(cfg.conv2d, block, ch, layers[i], stride=strides[i]))
+                res_layers.append(self._make_layer(cfg.conv2d, block, ch, layers[i], stride=strides[i]))
         else:
             for i, ch in enumerate(chs):
                 pool_param = pool_params[i]
@@ -151,7 +151,7 @@ class ResNet(nn.Module):
                 stride = pool_param['stride']
 
                 if pool2d==None:
-                    self.layers.append(self._make_layer(cfg.conv2d, block, ch, layers[i], stride=stride))
+                    res_layers.append(self._make_layer(cfg.conv2d, block, ch, layers[i], stride=stride))
                 else:
                     ksize = pool_param['ksize']
                     psize = pool_param['psize']
@@ -161,11 +161,12 @@ class ResNet(nn.Module):
                     else:
                         embed_dim = round(ch * dim_ratio)
                     num_heads = pool_param['num_heads']
-                    self.layers.append(nn.Sequential(
+                    res_layers.append(nn.Sequential(
                                   self._make_layer(cfg.conv2d, block, ch, layers[i], stride=1),
                                   pool2d(ch*block.expansion, kernel_size=ksize, stride=stride, patch_size=psize, embed_dim=embed_dim, num_heads=num_heads)
                                 ))
 
+        self.res_layers = nn.Sequential(*res_layers)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(chs[-1] * block.expansion, num_classes)
 
@@ -224,10 +225,10 @@ class ResNet(nn.Module):
         if self.pool1 != None:
             x = self.pool1(x)
 
-        x1 = self.layers[0](x)
-        x2 = self.layers[1](x1)
-        x3 = self.layers[2](x2)
-        x4 = self.layers[3](x3)
+        x1 = self.res_layers[0](x)
+        x2 = self.res_layers[1](x1)
+        x3 = self.res_layers[2](x2)
+        x4 = self.res_layers[3](x3)
 
         y = self.avgpool(x4)
         y = torch.flatten(y, 1)
@@ -258,6 +259,7 @@ def _resnet(arch, cfg, block, layers, pretrained, pth_file, **kwargs):
                 state_dict[k] = pv
         model_dict.update(state_dict)
         model.load_state_dict(model_dict)
+    print(model)
     return model
 
 

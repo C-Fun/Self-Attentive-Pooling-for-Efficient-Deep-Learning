@@ -437,7 +437,9 @@ if __name__ == '__main__':
 	device_ids = list(map(int, args.devices.split(',')))
 	model = nn.DataParallel(model, device_ids=device_ids)
 
-	#f.write('\n{}'.format(model))
+	# print(model)
+
+	# f.write('\n{}'.format(model))
 	
 	#CIFAR100 sometimes has problem to start training
 	#One solution is to train for CIFAR10 with same architecture
