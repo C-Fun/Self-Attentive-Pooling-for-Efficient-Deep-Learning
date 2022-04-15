@@ -91,6 +91,7 @@ class MIXP_BASE(nn.Module):
 class DeformNLP_BASE(NLP_BASE):
 	def __init__(self, in_channels, patch_size=2, embed_dim=None, num_heads=2):
 		super(DeformNLP_BASE, self).__init__(in_channels, patch_size, embed_dim, num_heads)
+		self.downsample = None
 		self.dcn = DCN(self.in_channels, self.embed_dim, kernel_size=self.patch_size, stride=self.patch_size, padding=0)
 		self.bn = nn.BatchNorm2d(self.embed_dim)
 		self.relu = nn.ReLU(inplace=True)
