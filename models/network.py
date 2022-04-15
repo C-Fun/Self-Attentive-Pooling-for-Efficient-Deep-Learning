@@ -5,7 +5,7 @@ from .backbones.resnet import resnet50
 from .backbones.mobile_net import mobilenetv2
 
 from .utils.dynamic_conv import dynamic_convolution_generator
-from .utils.pool_models import LIP2d, NLP2d, MixedPool
+from .utils.pool_models import LIP2d, NLP2d, MixedPool, DeformNLP, PosEncodeNLP
 
 class Network(nn.Module):
     def __init__(self, cfg, pretrained=False, pth_file=None, **kwargs):
@@ -42,6 +42,10 @@ class Network(nn.Module):
                 cfg.pool1[0] = NLP2d
             elif pool1_type == 'mixp':
                 cfg.pool1[0] = MixedPool
+            elif pool1_type == 'dfmnlp':
+                cfg.pool1[0] = DeformNLP
+            elif pool1_type == 'penlp':
+                cfg.pool1[0] = PosEncodeNLP
             else:
                 raise Exception("Undefined Pool1 Type!")
 
@@ -64,6 +68,12 @@ class Network(nn.Module):
                     pool2d = NLP2d
                 elif pool_type == 'mixp':
                     pool2d = MixedPool
+                elif pool_type == 'dfmnlp':
+                    pool2d = DeformNLP
+                elif pool_type == 'penlp':
+                    pool2d = PosEncodeNLP
+                else:
+                    raise Exception("Undefined Pool2d Type!")
 
                 cfg._poolparams[i]['pool2d'] = pool2d
                 for key in add_keys:

@@ -232,7 +232,8 @@ if __name__ == '__main__':
 																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP',
 																																	  'MOBILENET', 'MOBILENET_LIP', 'MOBILENET_NLP', 'MOBILENET_MIXP',
 																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP',
-																																	  'RESNET50_LIP2222', 'RESNET50_NLP2222', 'RESNET50_NLP_MAXPOOL2NLP'])
+																																	  'RESNET50_LIP2222', 'RESNET50_NLP2222', 'RESNET50_NLP_MAXPOOL2NLP',
+																																	  'RESNET50_DFMNLP', 'RESNET50_PENLP'])
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
 	parser.add_argument('--pretrained_backbone',         default='',                 type=str,       help='pretrained model to initialize Backbone')
@@ -415,6 +416,10 @@ if __name__ == '__main__':
 		from configs import resnet_nlp as cfg
 	if args.architecture.lower() == "resnet50_mixp":
 		from configs import resnet_mixp as cfg
+	if args.architecture.lower() == "resnet50_dfmnlp":
+		from configs import resnet_dfmnlp as cfg
+	if args.architecture.lower() == "resnet50_penlp":
+		from configs import resnet_penlp as cfg
 
 	if args.architecture.lower() == "mobilenet":
 		from configs._base import mobilenet as cfg
