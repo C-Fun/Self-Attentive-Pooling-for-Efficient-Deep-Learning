@@ -232,8 +232,9 @@ if __name__ == '__main__':
 																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP',
 																																	  'MOBILENET', 'MOBILENET_LIP', 'MOBILENET_NLP', 'MOBILENET_MIXP',
 																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP',
-																																	  'RESNET50_LIP2222', 'RESNET50_LIP4122', 'RESNET50_NLP2222', 'RESNET50_NLP4122', 'RESNET50_NLP_MAXPOOL2NLP',
-																																	  'RESNET50_DFMNLP', 'RESNET50_PENLP'])
+																																	  'RESNET50_LIP2222', 'RESNET50_LIP4222', 'RESNET50_NLP2222', 'RESNET50_NLP4222', 'RESNET50_NLP_MAXPOOL2NLP',
+																																	  'RESNET50_DFMNLP', 'RESNET50_PENLP', 'RESNET50_PENLP2222', 'RESNET50_PENLP4222'])
+	parser.add_argument('--im_size',                 default=None,             type=int,         help='image size')
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
 	parser.add_argument('--pretrained_backbone',         default='',                 type=str,       help='pretrained model to initialize Backbone')
@@ -264,6 +265,7 @@ if __name__ == '__main__':
 	dataset         = args.dataset
 	batch_size      = args.batch_size
 	architecture    = args.architecture
+	im_size 		= args.im_size
 	learning_rate   = args.learning_rate
 	pretrained_ann  = args.pretrained_ann
 	epochs          = args.epochs
@@ -330,11 +332,20 @@ if __name__ == '__main__':
 
 	
 	if dataset == 'CIFAR10' or dataset == 'CIFAR100':
-		transform_train = transforms.Compose([
-						  transforms.RandomCrop(32, padding=4),
-						  transforms.RandomHorizontalFlip(),
-						  transforms.ToTensor(),
-						  normalize])
+		if im_size==None:
+			im_size = 32
+			transform_train = transforms.Compose([
+							  transforms.RandomCrop(32, padding=4),
+							  transforms.RandomHorizontalFlip(),
+							  transforms.ToTensor(),
+							  normalize])
+		else:
+			transform_train = transforms.Compose([
+							  transforms.Resize(im_size),
+							  transforms.RandomResizedCrop(im_size),
+							  transforms.RandomHorizontalFlip(),
+							  transforms.ToTensor(),
+							  normalize])
 		transform_test = transforms.Compose([transforms.ToTensor(), normalize])
 	
 	if dataset == 'CIFAR100':
@@ -353,32 +364,53 @@ if __name__ == '__main__':
 	elif dataset == 'IMAGENET':
 		traindir    = os.path.join('/m2/data/imagenet', 'train')
 		valdir      = os.path.join('/m2/data/imagenet', 'val')
-		train_dataset    = datasets.ImageFolder(
-							traindir,
-							transforms.Compose([
-								transforms.RandomResizedCrop(224),
-								transforms.RandomHorizontalFlip(),
-								transforms.ToTensor(),
-								normalize,
-							]))
+		if im_size==None:
+			im_size = 224
+			train_dataset    = datasets.ImageFolder(
+								traindir,
+								transforms.Compose([
+									transforms.RandomResizedCrop(224),
+									transforms.RandomHorizontalFlip(),
+									transforms.ToTensor(),
+									normalize,
+								]))
+		else:
+			train_dataset    = datasets.ImageFolder(
+								traindir,
+								transforms.Compose([
+									transforms.Resize(im_size),
+									transforms.RandomResizedCrop(im_size),
+									transforms.RandomHorizontalFlip(),
+									transforms.ToTensor(),
+									normalize,
+								]))
 		test_dataset     = datasets.ImageFolder(
 							valdir,
 							transforms.Compose([
-								transforms.Resize(256),
-								transforms.CenterCrop(224),
+								transforms.Resize(im_size),
+								transforms.CenterCrop(im_size),
 								transforms.ToTensor(),
 								normalize,
 							]))
 	
 	elif dataset == 'STL10':
-		transform_train = transforms.Compose([
-						  transforms.RandomResizedCrop(96),
-						  transforms.RandomHorizontalFlip(),
-						  transforms.ToTensor(),
-						  normalize])
+		if im_size==None:
+			im_size = 96
+			transform_train = transforms.Compose([
+							  transforms.RandomResizedCrop(96),
+							  transforms.RandomHorizontalFlip(),
+							  transforms.ToTensor(),
+							  normalize])
+		else:
+			transform_train = transforms.Compose([
+							  transforms.Resize(im_size),
+							  transforms.RandomResizedCrop(im_size),
+							  transforms.RandomHorizontalFlip(),
+							  transforms.ToTensor(),
+							  normalize])
 		transform_test = transforms.Compose([
-						 transforms.Resize(96),
-						 transforms.CenterCrop(96),
+						 transforms.Resize(im_size),
+						 transforms.CenterCrop(im_size),
 						 transforms.ToTensor(),
 						 normalize,
 						 ])
@@ -434,12 +466,17 @@ if __name__ == '__main__':
 		from configs import resnet_lip2222 as cfg
 	if args.architecture.lower() == "resnet50_nlp2222":
 		from configs import resnet_nlp2222 as cfg
-	if args.architecture.lower() == "resnet50_lip4122":
-		from configs import resnet_lip4122 as cfg
-	if args.architecture.lower() == "resnet50_nlp4122":
-		from configs import resnet_nlp4122 as cfg
+	if args.architecture.lower() == "resnet50_lip4222":
+		from configs import resnet_lip4222 as cfg
+	if args.architecture.lower() == "resnet50_nlp4222":
+		from configs import resnet_nlp4222 as cfg
 	if args.architecture.lower() == "resnet50_nlp_maxpool2nlp":
 		from configs import resnet_nlp_maxpool2nlp as cfg
+
+	if args.architecture.lower() == "resnet50_penlp2222":
+		from configs import resnet_penlp2222 as cfg
+	if args.architecture.lower() == "resnet50_penlp4222":
+		from configs import resnet_penlp4222 as cfg
 
 	model = Network(cfg, num_classes=labels, pretrained=pretrained, pth_file=pth_file)
 
