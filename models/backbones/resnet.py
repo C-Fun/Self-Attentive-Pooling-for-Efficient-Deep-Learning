@@ -159,7 +159,7 @@ class ResNet(nn.Module):
                     if dim_ratio == None:
                         embed_dim = None
                     else:
-                        embed_dim = round(ch * dim_ratio)
+                        embed_dim = round(ch*block.expansion * dim_ratio)
                     num_heads = pool_param['num_heads']
                     res_layers.append(nn.Sequential(
                                   self._make_layer(cfg.conv2d, block, ch, layers[i], stride=1),

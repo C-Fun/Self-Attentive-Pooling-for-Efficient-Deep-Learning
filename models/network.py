@@ -5,7 +5,7 @@ from .backbones.resnet import resnet50
 from .backbones.mobile_net import mobilenetv2
 
 from .utils.dynamic_conv import dynamic_convolution_generator
-from .utils.pool_models import LIP2d, NLP2d, MixedPool, DeformNLP, PosEncodeNLP
+from .utils.pool_models import LIP2d, NLP2d, MixedPool, DeformNLP, PosEncodeNLP, GaussianP2d, PeNLPChLoc
 
 class Network(nn.Module):
     def __init__(self, cfg, pretrained=False, pth_file=None, **kwargs):
@@ -46,6 +46,10 @@ class Network(nn.Module):
                 cfg.pool1[0] = DeformNLP
             elif pool1_type == 'penlp':
                 cfg.pool1[0] = PosEncodeNLP
+            elif pool1_type == 'gaussianp':
+                cfg.pool1[0] = GaussianP2d
+            elif pool1_type == 'penlpch':
+                cfg.pool1[0] = PeNLPChLoc
             else:
                 raise Exception("Undefined Pool1 Type!")
 
@@ -72,6 +76,10 @@ class Network(nn.Module):
                     pool2d = DeformNLP
                 elif pool_type == 'penlp':
                     pool2d = PosEncodeNLP
+                elif pool_type == 'gaussianp':
+                    pool2d = GaussianP2d
+                elif pool_type == 'penlpch':
+                    pool2d = PeNLPChLoc
                 else:
                     raise Exception("Undefined Pool2d Type!")
 

@@ -87,7 +87,7 @@ from mmcv.ops.deform_conv import DeformConv2dFunction, DeformConv2dPack
 #         x_offset = self._reshape_x_offset(x_offset, ks)
 #         out = self.conv(x_offset)
 
-#         return out
+#         return (out, x_offset)
 
 #     def _get_p_n(self, N, dtype):
 #         p_n_x, p_n_y = torch.meshgrid(

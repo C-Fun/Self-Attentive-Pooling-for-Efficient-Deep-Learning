@@ -175,7 +175,6 @@ def test(epoch, loader):
 		#    exit(0)
 
 		
-
 		if top1.avg>max_accuracy:
 			max_accuracy = top1.avg
 			state = {
@@ -193,7 +192,7 @@ def test(epoch, loader):
 			if not args.dont_save:
 				torch.save(state,filename)
 		#dis = np.array(dis)
-		# 
+		#
 		
 		f.write(' test_loss: {:.4f}, test_acc: {:.4f}, best: {:.4f}, time: {}'.format(
 			losses.avg, 
@@ -202,14 +201,6 @@ def test(epoch, loader):
 			datetime.timedelta(seconds=(datetime.datetime.now() - start_time).seconds)
 			)
 		)
-		
-		
-		
-
-		
-
-		
-
 
 		# print("threshold value is \n")
 		# print(thresholds)
@@ -217,6 +208,23 @@ def test(epoch, loader):
 		#     datetime.timedelta(seconds=(datetime.datetime.now() - current_time).seconds)
 		#     )
 		# )
+
+def visualize(loader):
+	for batch_idx, (data, target) in enumerate(loader):
+		
+		if torch.cuda.is_available() and args.gpu:
+			data, target = data.cuda(), target.cuda()
+
+		# # output, thresholds = model(data, epoch)
+		# #output, thresholds = model(data)
+		# output = model(data)
+		for (name, module) in net.named_modules():
+			print(name)
+
+
+
+
+
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Train ANN to be later converted to SNN', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -232,8 +240,10 @@ if __name__ == '__main__':
 																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP',
 																																	  'MOBILENET', 'MOBILENET_LIP', 'MOBILENET_NLP', 'MOBILENET_MIXP',
 																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP',
-																																	  'RESNET50_LIP2222', 'RESNET50_LIP4222', 'RESNET50_NLP2222', 'RESNET50_NLP4222', 'RESNET50_NLP_MAXPOOL2NLP',
-																																	  'RESNET50_DFMNLP', 'RESNET50_PENLP', 'RESNET50_PENLP2222', 'RESNET50_PENLP4222'])
+																																	  'RESNET50_LIP2222', 'RESNET50_NLP2222', 'RESNET50_NLP_MAXPOOL2NLP',
+																																	  'RESNET50_DFMNLP', 'RESNET50_PENLP', 'RESNET50_PENLP2222',
+																																	  'RESNET4222', 'RESNET50_LIP4222', 'RESNET50_NLP4222', 'RESNET50_PENLP4222',
+																																	  'RESNET50_GAUSSIANP4222', 'RESNET50_GAUSSIANP', 'RESNET50_PENLPCH'])
 	parser.add_argument('--im_size',                 default=None,             type=int,         help='image size')
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
@@ -248,6 +258,8 @@ if __name__ == '__main__':
 	parser.add_argument('--dropout',                default=0.2,                type=float,     help='dropout percentage for conv layers')
 	parser.add_argument('--kernel_size',            default=3,                  type=int,       help='filter size for the conv layers')
 	parser.add_argument('--dont_save',              action='store_true',                        help='don\'t save training model during testing')
+	parser.add_argument('--visualize',              action='store_true',                        help='visualize the attention map')
+
 	parser.add_argument('--devices',                default='0',                type=str,       help='list of gpu device(s)')
 		
 	args=parser.parse_args()
@@ -452,6 +464,8 @@ if __name__ == '__main__':
 		from configs import resnet_dfmnlp as cfg
 	if args.architecture.lower() == "resnet50_penlp":
 		from configs import resnet_penlp as cfg
+	if args.architecture.lower() == "resnet50_penlpch":
+		from configs import resnet_penlpch as cfg
 
 	if args.architecture.lower() == "mobilenet":
 		from configs._base import mobilenet as cfg
@@ -462,21 +476,30 @@ if __name__ == '__main__':
 	if args.architecture.lower() == "mobilenet_mixp":
 		from configs import mobilenet_mixp as cfg
 
-	if args.architecture.lower() == "resnet50_lip2222":
-		from configs import resnet_lip2222 as cfg
-	if args.architecture.lower() == "resnet50_nlp2222":
-		from configs import resnet_nlp2222 as cfg
+	# if args.architecture.lower() == "resnet50_lip2222":
+	# 	from configs import resnet_lip2222 as cfg
+	# if args.architecture.lower() == "resnet50_nlp2222":
+	# 	from configs import resnet_nlp2222 as cfg
 	if args.architecture.lower() == "resnet50_lip4222":
-		from configs import resnet_lip4222 as cfg
+		from configs.control_experiment import resnet_lip4222 as cfg
 	if args.architecture.lower() == "resnet50_nlp4222":
-		from configs import resnet_nlp4222 as cfg
-	if args.architecture.lower() == "resnet50_nlp_maxpool2nlp":
-		from configs import resnet_nlp_maxpool2nlp as cfg
+		from configs.control_experiment import resnet_nlp4222 as cfg
+	# if args.architecture.lower() == "resnet50_nlp_maxpool2nlp":
+	# 	from configs import resnet_nlp_maxpool2nlp as cfg
 
-	if args.architecture.lower() == "resnet50_penlp2222":
-		from configs import resnet_penlp2222 as cfg
+	# if args.architecture.lower() == "resnet50_penlp2222":
+	# 	from configs import resnet_penlp2222 as cfg
 	if args.architecture.lower() == "resnet50_penlp4222":
-		from configs import resnet_penlp4222 as cfg
+		from configs.control_experiment import resnet_penlp4222 as cfg
+
+	if args.architecture.lower() == "resnet4222":
+		from configs.control_experiment import resnet4222 as cfg
+
+	if args.architecture.lower() == "resnet50_gaussianp4222":
+		from configs.control_experiment import resnet_gaussianp4222 as cfg
+
+	if args.architecture.lower() == "resnet50_gaussianp":
+		from configs import resnet_gaussianp as cfg
 
 	model = Network(cfg, num_classes=labels, pretrained=pretrained, pth_file=pth_file)
 
@@ -545,6 +568,7 @@ if __name__ == '__main__':
 		if not args.test_only:
 			train(epoch, train_loader)
 		test(epoch, test_loader)
-		   
+	if not args.visualize:
+		visualize(test_loader)
 		   
 	f.write('\n Highest accuracy: {:.4f}'.format(max_accuracy))
