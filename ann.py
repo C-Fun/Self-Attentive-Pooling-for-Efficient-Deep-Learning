@@ -217,7 +217,7 @@ def test(epoch, loader):
 		#     )
 		# )
 
-def visualize(loader, num_classes, visual_type='grad_cam'):
+def visualize(loader, num_classes, visual_type=['directly', 'grad_cam']):
 	def minmax(x):
 		return (x-np.min(x))/(1e-10+np.max(x)-np.min(x))
 
@@ -249,8 +249,14 @@ def visualize(loader, num_classes, visual_type='grad_cam'):
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 		# Directly Apply
-		if visual_type=='directly':
-			for name in name_list:
+		if 'directly' in visual_type:
+			plt.figure(1)
+			plt.suptitle('Directly')
+			subfig_num = len(name_list)+1
+			plt.subplot(100+10*subfig_num+1)
+			plt.imshow(img)
+			plt.title('Image')
+			for (i, name) in enumerate(name_list):
 				weight = activation[name]
 				restore_weight = F.interpolate(weight, size=(h,w), mode='bilinear')
 				avg_weight = torch.mean(restore_weight, axis=1)
@@ -258,37 +264,41 @@ def visualize(loader, num_classes, visual_type='grad_cam'):
 				heatmap = np.uint8(255 * minmax(heatmap))
 				heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
 				heatimg = minmax(heatmap*0.9+img)
+				plt.subplot(100+10*subfig_num+i+2)
 				plt.imshow(heatimg)
+				plt.title('Pool Layer '+str(i+1))
 
 
 		# Grad Cam
-		if visual_type=='grad_cam':
+		if 'grad_cam' in visual_type:
+			plt.figure(2)
+			plt.suptitle('Grad CAM')
 			target_layers = []
 			for module in module_list:
 				target_layers.append(module)
-				target_layers = [module]
+				# target_layers = [module]
 
-				cam = GradCAM(model=model, target_layers=target_layers, use_cuda=True)
+			cam = GradCAM(model=model, target_layers=target_layers, use_cuda=True)
 
-				target_cam = cam(input_tensor=data, targets=[ClassifierOutputTarget(target)])
-				target_cam = target_cam[0, :]
-				target_visual = show_cam_on_image(minmax(img), target_cam, use_rgb=True)
+			target_cam = cam(input_tensor=data, targets=[ClassifierOutputTarget(target)])
+			target_cam = target_cam[0, :]
+			target_visual = show_cam_on_image(minmax(img), target_cam, use_rgb=True)
 
-				pred_cam = cam(input_tensor=data, targets=[ClassifierOutputTarget(pred)])
-				pred_cam = pred_cam[0, :]
-				pred_visual = show_cam_on_image(minmax(img), pred_cam, use_rgb=True)
+			pred_cam = cam(input_tensor=data, targets=[ClassifierOutputTarget(pred)])
+			pred_cam = pred_cam[0, :]
+			pred_visual = show_cam_on_image(minmax(img), pred_cam, use_rgb=True)
 
-				plt.subplot(131)
-				plt.imshow(img)
-				plt.title('Image')
-				plt.subplot(132)
-				plt.imshow(target_visual)
-				plt.title('Target: '+str(target.detach().cpu().numpy()[0]))
-				plt.subplot(133)
-				plt.imshow(pred_visual)
-				plt.title('Pred: '+str(pred.detach().cpu().numpy()[0,0]))
+			plt.subplot(131)
+			plt.imshow(img)
+			plt.title('Image')
+			plt.subplot(132)
+			plt.imshow(target_visual)
+			plt.title('Target: '+str(target.detach().cpu().numpy()[0]))
+			plt.subplot(133)
+			plt.imshow(pred_visual)
+			plt.title('Pred: '+str(pred.detach().cpu().numpy()[0,0]))
 
-				plt.show()
+		plt.show()
 
 
 
