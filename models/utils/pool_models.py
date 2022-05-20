@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import torch.utils.checkpoint as cp
 from torch.nn.modules.batchnorm import _BatchNorm
 from torch.nn import MultiheadAttention
+from collections import OrderedDict
 
 from einops import rearrange, reduce, repeat
 from .deform_conv import DeformConv2d as DCN
@@ -194,7 +195,9 @@ class PeNLPChLoc_BASE(nn.Module):
 class POOL_BASE(nn.Module):
 	def __init__(self, BASE, in_channels, kernel_size=2, stride=2, padding=0, **kwargs):
 		super(POOL_BASE, self).__init__()
-		self.logit = BASE(in_channels, **kwargs)
+		self.logit = nn.Sequential(OrderedDict([
+			('pool_weight', BASE(in_channels, **kwargs))
+			]))
 		self.pool = nn.AvgPool2d(kernel_size=kernel_size, stride=stride, padding=padding)
 	def forward(self, x):
 		weight = self.logit(x)

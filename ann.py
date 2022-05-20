@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 import argparse
 from tqdm import tqdm
 import torch
@@ -11,9 +14,14 @@ import pdb
 import sys
 import datetime
 import os
+import cv2
 import numpy as np
 import json
 import pickle
+
+from pytorch_grad_cam import GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+from pytorch_grad_cam.utils.image import show_cam_on_image
 
 from models.network import Network
 
@@ -101,7 +109,7 @@ def train(epoch, loader):
 
 			if torch.cuda.is_available() and args.gpu:
 				data, target = data.cuda(), target.cuda()
-					
+
 			optimizer.zero_grad()
 			# output, _ = model(data)
 			# output, _ = model(data, epoch)
@@ -145,7 +153,7 @@ def test(epoch, loader):
 		global max_accuracy, start_time
 		
 		for batch_idx, (data, target) in enumerate(loader):
-						
+
 			if torch.cuda.is_available() and args.gpu:
 				data, target = data.cuda(), target.cuda()
 			
@@ -193,7 +201,7 @@ def test(epoch, loader):
 				torch.save(state,filename)
 		#dis = np.array(dis)
 		#
-		
+
 		f.write(' test_loss: {:.4f}, test_acc: {:.4f}, best: {:.4f}, time: {}'.format(
 			losses.avg, 
 			top1.avg,
@@ -209,18 +217,78 @@ def test(epoch, loader):
 		#     )
 		# )
 
-def visualize(loader):
+def visualize(loader, num_classes, visual_type='grad_cam'):
+	def minmax(x):
+		return (x-np.min(x))/(1e-10+np.max(x)-np.min(x))
+
+	activation = {}
+	def get_activation(name):
+		def hook(model, input, output):
+			activation[name] = output
+		return hook
+
+	name_list = []
+	module_list = []
+	for (name, module) in model.named_modules():
+		if name.endswith('pool_weight'):
+			module.register_forward_hook(get_activation(name))
+			name_list.append(name)
+			module_list.append(module)
+
 	for batch_idx, (data, target) in enumerate(loader):
-		
+
 		if torch.cuda.is_available() and args.gpu:
 			data, target = data.cuda(), target.cuda()
 
-		# # output, thresholds = model(data, epoch)
-		# #output, thresholds = model(data)
-		# output = model(data)
-		for (name, module) in net.named_modules():
-			print(name)
+		
+		output = model(data)
+		pred = output.max(1,keepdim=True)[1]
+		(b, c, h, w) = data.shape
+		img = data[0,:,:,:].detach().cpu().numpy().transpose([1,2,0])
+		img = np.uint8(255 * minmax(img))
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+		# Directly Apply
+		if visual_type=='directly':
+			for name in name_list:
+				weight = activation[name]
+				restore_weight = F.interpolate(weight, size=(h,w), mode='bilinear')
+				avg_weight = torch.mean(restore_weight, axis=1)
+				heatmap = avg_weight.detach().cpu().numpy().transpose([1,2,0])
+				heatmap = np.uint8(255 * minmax(heatmap))
+				heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+				heatimg = minmax(heatmap*0.9+img)
+				plt.imshow(heatimg)
+
+
+		# Grad Cam
+		if visual_type=='grad_cam':
+			target_layers = []
+			for module in module_list:
+				target_layers.append(module)
+				target_layers = [module]
+
+				cam = GradCAM(model=model, target_layers=target_layers, use_cuda=True)
+
+				target_cam = cam(input_tensor=data, targets=[ClassifierOutputTarget(target)])
+				target_cam = target_cam[0, :]
+				target_visual = show_cam_on_image(minmax(img), target_cam, use_rgb=True)
+
+				pred_cam = cam(input_tensor=data, targets=[ClassifierOutputTarget(pred)])
+				pred_cam = pred_cam[0, :]
+				pred_visual = show_cam_on_image(minmax(img), pred_cam, use_rgb=True)
+
+				plt.subplot(131)
+				plt.imshow(img)
+				plt.title('Image')
+				plt.subplot(132)
+				plt.imshow(target_visual)
+				plt.title('Target: '+str(target.detach().cpu().numpy()[0]))
+				plt.subplot(133)
+				plt.imshow(pred_visual)
+				plt.title('Pred: '+str(pred.detach().cpu().numpy()[0,0]))
+
+				plt.show()
 
 
 
@@ -261,7 +329,7 @@ if __name__ == '__main__':
 	parser.add_argument('--visualize',              action='store_true',                        help='visualize the attention map')
 
 	parser.add_argument('--devices',                default='0',                type=str,       help='list of gpu device(s)')
-		
+
 	args=parser.parse_args()
 
 	os.environ['CUDA_VISIBLE_DEVICES'] = args.devices
@@ -338,7 +406,7 @@ if __name__ == '__main__':
 		labels = 1000
 	elif dataset == 'STL10':
 		normalize = transforms.Normalize(mean=[0.5, 0.5, 0.5],
-								 		 std=[0.5, 0.5, 0.5])
+										 std=[0.5, 0.5, 0.5])
 		labels = 10
 
 
@@ -568,7 +636,8 @@ if __name__ == '__main__':
 		if not args.test_only:
 			train(epoch, train_loader)
 		test(epoch, test_loader)
-	if not args.visualize:
-		visualize(test_loader)
-		   
+	if args.visualize:
+		visual_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
+		visualize(visual_loader, num_classes=labels)
+
 	f.write('\n Highest accuracy: {:.4f}'.format(max_accuracy))
