@@ -4,7 +4,8 @@ import torch.nn as nn
 from .backbones.resnet import resnet50
 from .backbones.mobile_net import mobilenetv2
 
-from .utils.dynamic_conv import dynamic_convolution_generator
+# from .utils.dynamic_conv import dynamic_convolution_generator
+from .utils.dynamic_convs.implementation2 import Dynamic_conv2d
 from .utils.pool_models import LIP2d, NLP2d, MixedPool, DeformNLP, PosEncodeNLP, GaussianP2d, PeNLPChLoc
 
 class Network(nn.Module):
@@ -14,6 +15,9 @@ class Network(nn.Module):
         conv1_type = cfg.conv1[0]
         if conv1_type == 'normal':
             cfg.conv1[0] = nn.Conv2d
+        elif conv1_type == 'dynamic':
+            # cfg.conv1[0] = dynamic_convolution_generator(4, 4)
+            cfg.conv1[0] = Dynamic_conv2d
         else:
             raise Exception("Undefined Conv1 Type!")
 
@@ -22,7 +26,8 @@ class Network(nn.Module):
         if conv2d_type == 'normal':
             cfg.conv2d = nn.Conv2d
         elif conv2d_type == 'dynamic':
-            cfg.conv2d = dynamic_convolution_generator(4, 4)
+            # cfg.conv2d = dynamic_convolution_generator(4, 4)
+            cfg.conv2d = Dynamic_conv2d
         else:
             raise Exception("Undefined Conv2d Type!")
 

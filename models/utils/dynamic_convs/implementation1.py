@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from torch.nn import init
 from torch.nn.modules.utils import _pair
 from torch import nn
-from .common import TempModule
+from RPIXEL.models.utils.common import TempModule
 
 
 class AttentionLayer(nn.Module):

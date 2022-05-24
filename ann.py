@@ -321,7 +321,8 @@ if __name__ == '__main__':
 																																	  'RESNET50_LIP2222', 'RESNET50_NLP2222', 'RESNET50_NLP_MAXPOOL2NLP',
 																																	  'RESNET50_DFMNLP', 'RESNET50_PENLP', 'RESNET50_PENLP2222',
 																																	  'RESNET4222', 'RESNET50_LIP4222', 'RESNET50_NLP4222', 'RESNET50_PENLP4222',
-																																	  'RESNET50_GAUSSIANP4222', 'RESNET50_GAUSSIANP', 'RESNET50_PENLPCH'])
+																																	  'RESNET50_GAUSSIANP4222', 'RESNET50_GAUSSIANP', 'RESNET50_PENLPCH',
+																																	  'RESNET50_2222', 'RESNET50_4222', 'DYRESNET50_2222', 'DYRESNET50_4222'])
 	parser.add_argument('--im_size',                 default=None,             type=int,         help='image size')
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
@@ -532,6 +533,18 @@ if __name__ == '__main__':
 
 	if args.architecture.lower() == "resnet50":
 		from configs._base import resnet as cfg
+	if args.architecture.lower() == "resnet50_2222":
+		from configs.workshop_exp import resnet_2222 as cfg
+	if args.architecture.lower() == "resnet50_4222":
+		from configs.workshop_exp import resnet_4222 as cfg
+
+	if args.architecture.lower() == "dyresnet50":
+		from configs._base import dyresnet as cfg
+	if args.architecture.lower() == "dyresnet50_2222":
+		from configs.workshop_exp import dyresnet_2222 as cfg
+	if args.architecture.lower() == "dyresnet50_4222":
+		from configs.workshop_exp import dyresnet_4222 as cfg
+
 	if args.architecture.lower() == "resnet50_lip":
 		from configs import resnet_lip as cfg
 	if args.architecture.lower() == "resnet50_nlp":
@@ -578,6 +591,7 @@ if __name__ == '__main__':
 
 	if args.architecture.lower() == "resnet50_gaussianp":
 		from configs import resnet_gaussianp as cfg
+
 
 	model = Network(cfg, num_classes=labels, pretrained=pretrained, pth_file=pth_file)
 
@@ -641,13 +655,13 @@ if __name__ == '__main__':
 	
 	max_accuracy = 0.0
 	#compute_mac(model, dataset)
-	for epoch in range(1, epochs):    
+	for epoch in range(1, epochs):
 		start_time = datetime.datetime.now()
 		if not args.test_only:
 			train(epoch, train_loader)
 		test(epoch, test_loader)
 	if args.visualize:
-		visual_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=True)
+		visual_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 		visualize(visual_loader, num_classes=labels)
 
 	f.write('\n Highest accuracy: {:.4f}'.format(max_accuracy))
