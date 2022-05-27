@@ -314,15 +314,11 @@ if __name__ == '__main__':
 	parser.add_argument('--dataset',                default='CIFAR10',          type=str,       help='dataset name', choices=['MNIST','CIFAR10','CIFAR100', 'IMAGENET', 'STL10'])
 	parser.add_argument('--batch_size',             default=64,                 type=int,       help='minibatch size')
 	# parser.add_argument('--log',                    action='store_true',                        help='to print the output on terminal or to log file')
-	parser.add_argument('-a','--architecture',      default='VGG16',            type=str,       help='network architecture', choices=['RESNET50', 'RESNET50_LIP', 'RESNET50_NLP', 'RESNET50_MIXP', 
-																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_NLP', 'DYRESNET50_MIXP',
-																																	  'MOBILENET', 'MOBILENET_LIP', 'MOBILENET_NLP', 'MOBILENET_MIXP',
-																																	  'DYMOBILENET', 'DYMOBILENET_LIP', 'DYMOBILENET_NLP', 'DYMOBILENET_MIXP',
-																																	  'RESNET50_LIP2222', 'RESNET50_NLP2222', 'RESNET50_NLP_MAXPOOL2NLP',
-																																	  'RESNET50_DFMNLP', 'RESNET50_PENLP', 'RESNET50_PENLP2222',
-																																	  'RESNET4222', 'RESNET50_LIP4222', 'RESNET50_NLP4222', 'RESNET50_PENLP4222',
-																																	  'RESNET50_GAUSSIANP4222', 'RESNET50_GAUSSIANP', 'RESNET50_PENLPCH',
-																																	  'RESNET50_2222', 'RESNET50_4222', 'DYRESNET50_2222', 'DYRESNET50_4222'])
+	parser.add_argument('-a','--architecture',      default='VGG16',            type=str,       help='network architecture', choices=['RESNET50', 'RESNET50_LIP', 'RESNET50_GAUSSIAN_POOL', 'RESNET50_NLP', 
+																																	  'RESNET50_DFMNLP', 'RESNET50_MIXP',
+
+																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_GAUSSIAN_POOL', 'DYRESNET50_NLP', 
+																																	  'DYRESNET50_DFMNLP', 'DYRESNET50_MIXP',])
 	parser.add_argument('--im_size',                 default=None,             type=int,         help='image size')
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')
@@ -421,7 +417,6 @@ if __name__ == '__main__':
 		labels = 10
 
 
-	
 	if dataset == 'CIFAR10' or dataset == 'CIFAR100':
 		if im_size==None:
 			im_size = 32
@@ -512,93 +507,48 @@ if __name__ == '__main__':
 	train_loader    = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
 	
 	test_loader     = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
-	
-	# if architecture[0:3].lower() == 'vgg':
-	#     model = VGG_TUNABLE_THRESHOLD(vgg_name=architecture, labels=labels, dataset=dataset, kernel_size=kernel_size, dropout=dropout, default_threshold=threshold)
-	# elif architecture[0:3].lower() == 'res':
-	#     if architecture.lower() == 'resnet12':
-	#         model = ResNet12(labels=labels, dropout=dropout, default_threshold=threshold)
-	#     elif architecture.lower() == 'resnet20':
-	#         model = ResNet20(labels=labels, dropout=dropout, default_threshold=threshold)
-	#     elif architecture.lower() == 'resnet34':
-	#         model = ResNet34(labels=labels, dropout=dropout, default_threshold=threshold)
 
 
 	if args.pretrained_backbone:
-		pretrained = True
 		pth_file = args.pretrained_backbone
 	else:
-		pretrained = False
 		pth_file = None
 
 	if args.architecture.lower() == "resnet50":
-		from configs._base import resnet as cfg
-	if args.architecture.lower() == "resnet50_2222":
-		from configs.workshop_exp import resnet_2222 as cfg
-	if args.architecture.lower() == "resnet50_4222":
-		from configs.workshop_exp import resnet_4222 as cfg
+		from configs.resnet.resnet50 import cfg
+	if args.architecture.lower() == "resnet50_lip":
+		from configs.resnet.resnet50_lip import cfg
+	if args.architecture.lower() == "resnet50_gaussian_pool":
+		from configs.resnet.resnet50_gaussian_pool import cfg
+	if args.architecture.lower() == "resnet50_nlp":
+		from configs.resnet.resnet50_nlp import cfg
+	if args.architecture.lower() == "resnet50_dfmnlp":
+		from configs.resnet.resnet50_dfmnlp import cfg
+	if args.architecture.lower() == "resnet50_mixp":
+		from configs.resnet.resnet50_mixp import cfg
 
 	if args.architecture.lower() == "dyresnet50":
-		from configs._base import dyresnet as cfg
-	if args.architecture.lower() == "dyresnet50_2222":
-		from configs.workshop_exp import dyresnet_2222 as cfg
-	if args.architecture.lower() == "dyresnet50_4222":
-		from configs.workshop_exp import dyresnet_4222 as cfg
+		from configs.dyresnet.dyresnet50 import cfg
+	if args.architecture.lower() == "dyresnet50_lip":
+		from configs.dyresnet.dyresnet50_lip import cfg
+	if args.architecture.lower() == "dyresnet50_gaussian_pool":
+		from configs.dyresnet.dyresnet50_gaussian_pool import cfg
+	if args.architecture.lower() == "dyresnet50_nlp":
+		from configs.dyresnet.dyresnet50_nlp import cfg
+	if args.architecture.lower() == "dyresnet50_dfmnlp":
+		from configs.dyresnet.dyresnet50_dfmnlp import cfg
+	if args.architecture.lower() == "dyresnet50_mixp":
+		from configs.dyresnet.dyresnet50_mixp import cfg
 
-	if args.architecture.lower() == "resnet50_lip":
-		from configs import resnet_lip as cfg
-	if args.architecture.lower() == "resnet50_nlp":
-		from configs import resnet_nlp as cfg
-	if args.architecture.lower() == "resnet50_mixp":
-		from configs import resnet_mixp as cfg
-	if args.architecture.lower() == "resnet50_dfmnlp":
-		from configs import resnet_dfmnlp as cfg
-	if args.architecture.lower() == "resnet50_penlp":
-		from configs import resnet_penlp as cfg
-	if args.architecture.lower() == "resnet50_penlpch":
-		from configs import resnet_penlpch as cfg
-
-	if args.architecture.lower() == "mobilenet":
-		from configs._base import mobilenet as cfg
-	if args.architecture.lower() == "mobilenet_lip":
-		from configs import mobilenet_lip as cfg
-	if args.architecture.lower() == "mobilenet_nlp":
-		from configs import mobilenet_nlp as cfg
-	if args.architecture.lower() == "mobilenet_mixp":
-		from configs import mobilenet_mixp as cfg
-
-	# if args.architecture.lower() == "resnet50_lip2222":
-	# 	from configs import resnet_lip2222 as cfg
-	# if args.architecture.lower() == "resnet50_nlp2222":
-	# 	from configs import resnet_nlp2222 as cfg
-	if args.architecture.lower() == "resnet50_lip4222":
-		from configs.control_experiment import resnet_lip4222 as cfg
-	if args.architecture.lower() == "resnet50_nlp4222":
-		from configs.control_experiment import resnet_nlp4222 as cfg
-	# if args.architecture.lower() == "resnet50_nlp_maxpool2nlp":
-	# 	from configs import resnet_nlp_maxpool2nlp as cfg
-
-	# if args.architecture.lower() == "resnet50_penlp2222":
-	# 	from configs import resnet_penlp2222 as cfg
-	if args.architecture.lower() == "resnet50_penlp4222":
-		from configs.control_experiment import resnet_penlp4222 as cfg
-
-	if args.architecture.lower() == "resnet4222":
-		from configs.control_experiment import resnet4222 as cfg
-
-	if args.architecture.lower() == "resnet50_gaussianp4222":
-		from configs.control_experiment import resnet_gaussianp4222 as cfg
-
-	if args.architecture.lower() == "resnet50_gaussianp":
-		from configs import resnet_gaussianp as cfg
-
-
-	model = Network(cfg, num_classes=labels, pretrained=pretrained, pth_file=pth_file)
+	model = Network(cfg, num_classes=labels, pth_file=pth_file)
 
 	device_ids = list(map(int, args.devices.split(',')))
 	model = nn.DataParallel(model, device_ids=device_ids)
 
 	# print(model)
+	for name, param in model.named_parameters():
+		if param.requires_grad:
+			print(name)
 
 	# f.write('\n{}'.format(model))
 	

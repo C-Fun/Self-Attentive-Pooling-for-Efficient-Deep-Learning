@@ -1,103 +1,90 @@
 import torch
 import torch.nn as nn
 
-from .backbones.resnet import resnet50
-from .backbones.mobile_net import mobilenetv2
+from .backbones.resnet_v2 import resnet18, resnet50
+# from .backbones.mobile_net import mobilenetv2
 
-# from .utils.dynamic_conv import dynamic_convolution_generator
-from .utils.dynamic_convs.implementation2 import Dynamic_conv2d
-from .utils.pool_models import LIP2d, NLP2d, MixedPool, DeformNLP, PosEncodeNLP, GaussianP2d, PeNLPChLoc
+from .utils.pool_models.common import *
+from .utils.dynamic_convs.dynamic_conv import Dynamic_conv2d
+
+def pool2d(_ptype):
+    if _ptype=='skip':
+        return skip_pool2d
+    elif _ptype=='maxp':
+        return max_pool2d
+    elif _ptype=='avgp':
+        return avg_pool2d
+    elif _ptype=='lip':
+        return lip2d
+    elif _ptype=='gaussian_pool':
+        return gaussian_pool2d
+    elif _ptype=='nlp':
+        return nlp2d
+    elif _ptype=='dfm_nlp':
+        return dfm_nlp2d
+    elif _ptype=='mixp':
+        return mixp2d
+    else:
+        raise Exception("Undefined Pooling Type!")
+
+def conv2d(_ctype):
+    if _ctype == None:
+        return None
+    elif _ctype == 'norm':
+        return nn.Conv2d
+    elif _ctype == 'dynamic':
+        return Dynamic_conv2d
+    else:
+        raise Exception("Undefined Convolutional Type!")
+
+class PoolConfig:
+    def __init__(self, cfg):
+        self._ptype = cfg['_ptype']
+        self._pool2d = pool2d(cfg['_ptype'])
+        self._ksize = cfg['_ksize']
+        self._stride = cfg['_stride']
+        self._padding = cfg['_padding']
+        self._psize = cfg['_psize']
+        self._dim_reduced_ratio = cfg['_dim_reduced_ratio']
+        self._num_heads = cfg['_num_heads']
+        self._conv2d = conv2d(cfg['_conv2d'])
+        self._win_norm = cfg['_win_norm']
+
+
+class Config:
+    def __init__(self, cfg):
+        self._conv2d = conv2d(cfg['_conv2d'])
+
+        pool_keys = ('_ptype', '_ksize', '_stride', '_padding', '_psize', '_dim_reduced_ratio', '_num_heads', '_conv2d', '_win_norm')
+        pool_cfg = cfg['pool_cfg']
+        for key in pool_keys:
+            if key not in pool_cfg.keys():
+                pool_cfg[key] = None
+        self.pool_cfg = PoolConfig(pool_cfg)
+
+
+def cfg_parse(cfg):
+    for k in cfg.keys():
+        if k=='arch':
+            continue
+        else:
+            cfg[k] = Config(cfg[k])
+    return cfg
+
 
 class Network(nn.Module):
-    def __init__(self, cfg, pretrained=False, pth_file=None, **kwargs):
+    def __init__(self, cfg, pth_file=None, **kwargs):
         super(Network, self).__init__()
-        # ====== conv1 args parse =========
-        conv1_type = cfg.conv1[0]
-        if conv1_type == 'normal':
-            cfg.conv1[0] = nn.Conv2d
-        elif conv1_type == 'dynamic':
-            # cfg.conv1[0] = dynamic_convolution_generator(4, 4)
-            cfg.conv1[0] = Dynamic_conv2d
-        else:
-            raise Exception("Undefined Conv1 Type!")
-
-        # ====== conv2d args parse =========
-        conv2d_type = cfg._convtype
-        if conv2d_type == 'normal':
-            cfg.conv2d = nn.Conv2d
-        elif conv2d_type == 'dynamic':
-            # cfg.conv2d = dynamic_convolution_generator(4, 4)
-            cfg.conv2d = Dynamic_conv2d
-        else:
-            raise Exception("Undefined Conv2d Type!")
-
-        # ====== pool1 args parse =========
-        try:
-            print(cfg.pool1)
-        except:
-            cfg.pool1 = None           
-
-        if cfg.pool1 != None:
-            pool1_type = cfg.pool1[0]
-            if pool1_type == 'maxpool':
-                cfg.pool1[0] = nn.MaxPool2d
-            elif pool1_type == 'lip':
-                cfg.pool1[0] = LIP2d
-            elif pool1_type == 'nlp':
-                cfg.pool1[0] = NLP2d
-            elif pool1_type == 'mixp':
-                cfg.pool1[0] = MixedPool
-            elif pool1_type == 'dfmnlp':
-                cfg.pool1[0] = DeformNLP
-            elif pool1_type == 'penlp':
-                cfg.pool1[0] = PosEncodeNLP
-            elif pool1_type == 'gaussianp':
-                cfg.pool1[0] = GaussianP2d
-            elif pool1_type == 'penlpch':
-                cfg.pool1[0] = PeNLPChLoc
-            else:
-                raise Exception("Undefined Pool1 Type!")
-
-        # ====== pool params args parse =========
-        add_keys = ['ksize', 'psize', 'dim_reduced_ratio', 'num_heads']
-        if cfg._poolparams != None:
-            for i in range(len(cfg._poolparams)):
-                pool_param = cfg._poolparams[i]
-                if 'type' not in pool_param.keys():
-                    raise Exception("Need to define the pool type!")
-                if 'stride' not in pool_param.keys():
-                    raise Exception("Need to define the stride!")
-
-                pool_type = pool_param['type']
-                if pool_type == 'none':
-                    pool2d = None
-                elif pool_type == 'lip':
-                    pool2d = LIP2d
-                elif pool_type == 'nlp':
-                    pool2d = NLP2d
-                elif pool_type == 'mixp':
-                    pool2d = MixedPool
-                elif pool_type == 'dfmnlp':
-                    pool2d = DeformNLP
-                elif pool_type == 'penlp':
-                    pool2d = PosEncodeNLP
-                elif pool_type == 'gaussianp':
-                    pool2d = GaussianP2d
-                elif pool_type == 'penlpch':
-                    pool2d = PeNLPChLoc
-                else:
-                    raise Exception("Undefined Pool2d Type!")
-
-                cfg._poolparams[i]['pool2d'] = pool2d
-                for key in add_keys:
-                    if key not in pool_param.keys():
-                        cfg._poolparams[i][key] = None
+        arch = cfg['arch']
+        cfg = cfg_parse(cfg)
 
         # ========== backbone =================
-        if cfg._backbone == 'resnet50':
-            self.net = resnet50(cfg, pretrained=pretrained, pth_file=pth_file, **kwargs)
-        elif cfg._backbone == 'mobilenet':
-            self.net = mobilenetv2(cfg, pretrained=pretrained, pth_file=pth_file, **kwargs)
+        if arch == 'resnet18':
+            self.net = resnet18(cfg, pth_file=pth_file, **kwargs)
+        elif arch == 'resnet50':
+            self.net = resnet50(cfg, pth_file=pth_file, **kwargs)
+        # elif arch == 'mobilenet':
+        #     self.net = mobilenetv2(cfg, pth_file=pth_file, **kwargs)
     def forward(self, x):
         outs = self.net(x)
         return outs
