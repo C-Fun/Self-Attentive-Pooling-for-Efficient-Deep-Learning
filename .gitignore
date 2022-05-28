@@ -1,6 +1,9 @@
-/data/
-/trained_models_ann/
-/logs_new/
-/check_points/
 *.zip
 *.pyc
+
+/mmdetection/
+
+/base/check_points/
+/base/data/
+/base/logs_new/
+/base/trained_models_ann/
