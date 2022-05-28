@@ -29,9 +29,9 @@ cfg = {'arch': _arch,
 			    			 '_ksize': 2,
 			   				 '_stride': 2,
 			   				 '_padding': 0,
-			   				 '_psize': 1,
+			   				 '_psize': 4,
 			   				 '_dim_reduced_ratio': 1,
-			   				 '_num_heads': 2,
+			   				 '_num_heads': 8,
 			   				 '_conv2d': _ctype,
 			   				 '_win_norm': _win_norm
 			   				}
@@ -42,9 +42,9 @@ cfg = {'arch': _arch,
 			    			 '_ksize': 2,
 			   				 '_stride': 2,
 			   				 '_padding': 0,
-			   				 '_psize': 1,
+			   				 '_psize': 2,
 			   				 '_dim_reduced_ratio': 1,
-			   				 '_num_heads': 4,
+			   				 '_num_heads': 16,
 			   				 '_conv2d': _ctype,
 			   				 '_win_norm': _win_norm
 			   				}
@@ -57,7 +57,7 @@ cfg = {'arch': _arch,
 			   				 '_padding': 0,
 			   				 '_psize': 1,
 			   				 '_dim_reduced_ratio': 1,
-			   				 '_num_heads': 8,
+			   				 '_num_heads': 32,
 			   				 '_conv2d': _ctype,
 			   				 '_win_norm': _win_norm
 			   				}

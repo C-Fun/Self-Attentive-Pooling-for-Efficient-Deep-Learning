@@ -1,5 +1,5 @@
-_arch = 'resnet50'
-_ctype = 'dynamic'
+_arch = 'resnet50_v2'
+_ctype = 'norm'
 _ptype = 'gaussian_pool'
 
 cfg = {'arch': _arch,

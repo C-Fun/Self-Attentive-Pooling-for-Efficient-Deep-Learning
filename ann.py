@@ -371,7 +371,7 @@ if __name__ == '__main__':
 		lr_interval.append(int(float(value)*args.epochs))
 	
 	
-	log_file = './logs_new/'
+	log_file = './logs_new/'+architecture.lower().split('_')[0]+'/'
 	try:
 		os.mkdir(log_file)
 	except OSError:
@@ -514,33 +514,10 @@ if __name__ == '__main__':
 	else:
 		pth_file = None
 
-	if args.architecture.lower() == "resnet50":
-		from configs.resnet.resnet50 import cfg
-	if args.architecture.lower() == "resnet50_lip":
-		from configs.resnet.resnet50_lip import cfg
-	if args.architecture.lower() == "resnet50_gaussian_pool":
-		from configs.resnet.resnet50_gaussian_pool import cfg
-	if args.architecture.lower() == "resnet50_nlp":
-		from configs.resnet.resnet50_nlp import cfg
-	if args.architecture.lower() == "resnet50_dfmnlp":
-		from configs.resnet.resnet50_dfmnlp import cfg
-	if args.architecture.lower() == "resnet50_mixp":
-		from configs.resnet.resnet50_mixp import cfg
 
-	if args.architecture.lower() == "dyresnet50":
-		from configs.dyresnet.dyresnet50 import cfg
-	if args.architecture.lower() == "dyresnet50_lip":
-		from configs.dyresnet.dyresnet50_lip import cfg
-	if args.architecture.lower() == "dyresnet50_gaussian_pool":
-		from configs.dyresnet.dyresnet50_gaussian_pool import cfg
-	if args.architecture.lower() == "dyresnet50_nlp":
-		from configs.dyresnet.dyresnet50_nlp import cfg
-	if args.architecture.lower() == "dyresnet50_dfmnlp":
-		from configs.dyresnet.dyresnet50_dfmnlp import cfg
-	if args.architecture.lower() == "dyresnet50_mixp":
-		from configs.dyresnet.dyresnet50_mixp import cfg
+	model_name = args.architecture.lower()
 
-	model = Network(cfg, num_classes=labels, pth_file=pth_file)
+	model = Network(model_name, num_classes=labels, pth_file=pth_file)
 
 	device_ids = list(map(int, args.devices.split(',')))
 	model = nn.DataParallel(model, device_ids=device_ids)
@@ -548,7 +525,7 @@ if __name__ == '__main__':
 	# print(model)
 	for name, param in model.named_parameters():
 		if param.requires_grad:
-			print(name)
+			print('Trainable:', name)
 
 	# f.write('\n{}'.format(model))
 	

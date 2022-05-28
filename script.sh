@@ -14,3 +14,5 @@
 # python ann.py --dataset CIFAR100 --batch_size 64 --architecture RESNET50 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1,2,3 --seed 0 --log
 
 python ann.py --dataset STL10 --batch_size 8 --architecture RESNET50_NLP --im_size 224 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+
+python ann.py --dataset STL10 --batch_size 1 --architecture RESNET50_NLP --im_size 224 --learning_rate 1e-2 --epochs 1 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0 --seed 0 --log --dont_save --test_only --visualize --pretrained_ann './trained_model_ann/...'

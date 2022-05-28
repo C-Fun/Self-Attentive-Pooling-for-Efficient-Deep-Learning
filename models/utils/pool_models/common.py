@@ -27,7 +27,7 @@ class Pool2d(nn.Module):
 
 
 def lip2d(inc, kernel_size, stride, padding, **kwargs):
-	return Pool2d(win_norm, LIP_BASE, inc, kernel_size, stride, padding)
+	return Pool2d(LIP_BASE, inc, kernel_size, stride, padding)
 
 def nlp2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
 	return Pool2d(NLP_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)
@@ -40,8 +40,8 @@ def mixp2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
 
 
 
-def skip_pool2d(**kwargs):
-	return None
+# def skip_pool2d(**kwargs):
+# 	return None
 
 def max_pool2d(kernel_size, stride, padding, **kwargs):
 	return nn.MaxPool2d(kernel_size=kernel_size, stride=stride, padding=padding)

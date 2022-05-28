@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-__all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
-           'resnet152', 'resnext50_32x4d', 'resnext101_32x8d']
+__all__ = ['ResNet_v2', 'resnet18_v2', 'resnet34_v2', 'resnet50_v2', 'resnet101_v2',
+           'resnet152_v2', 'resnext50_32x4d_v2', 'resnext101_32x8d_v2']
 
 
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1, conv2d=nn.Conv2d):
@@ -15,6 +15,17 @@ def conv1x1(in_planes, out_planes, stride=1, conv2d=nn.Conv2d):
     """1x1 convolution"""
     return conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
 
+
+def pooling(inc, pool_cfg):
+    return pool_cfg._pool2d(inc=inc, \
+                            kernel_size=pool_cfg._ksize, \
+                            stride=pool_cfg._stride, \
+                            padding=pool_cfg._padding, \
+                            patch_size=pool_cfg._psize, \
+                            dim_reduced_ratio=pool_cfg._dim_reduced_ratio, \
+                            num_heads=pool_cfg._num_heads, \
+                            conv2d=pool_cfg._conv2d, \
+                            win_norm=pool_cfg._win_norm)
 
 
 class BasicBlock(nn.Module):
@@ -41,15 +52,7 @@ class BasicBlock(nn.Module):
         self.downsample = downsample
         self.stride = stride
         if stride > 1:
-            self.pooling = pool_cfg._pool2d(inc=planes, \
-                                           kernel_size=pool_cfg._ksize, \
-                                           stride=pool_cfg._stride, \
-                                           padding=pool_cfg._padding, \
-                                           patch_size=pool_cfg._psize, \
-                                           dim_reduced_ratio=pool_cfg._dim_reduced_ratio, \
-                                           num_heads=pool_cfg._num_heads, \
-                                           conv2d=pool_cfg._conv2d, \
-                                           win_norm=pool_cfg._win_norm)
+            self.pooling = pooling(planes, pool_cfg)
         else:
             self.pooling = None
 
@@ -98,15 +101,7 @@ class Bottleneck(nn.Module):
         self.downsample = downsample
         self.stride = stride
         if stride > 1:
-            self.pooling = pool_cfg._pool2d(inc=planes * self.expansion, \
-                                           kernel_size=pool_cfg._ksize, \
-                                           stride=pool_cfg._stride, \
-                                           padding=pool_cfg._padding, \
-                                           patch_size=pool_cfg._psize, \
-                                           dim_reduced_ratio=pool_cfg._dim_reduced_ratio, \
-                                           num_heads=pool_cfg._num_heads, \
-                                           conv2d=pool_cfg._conv2d, \
-                                           win_norm=pool_cfg._win_norm)
+            self.pooling = pooling(planes * self.expansion, pool_cfg)
         else:
             self.pooling = None
 
@@ -136,12 +131,12 @@ class Bottleneck(nn.Module):
         return out
 
 
-class ResNet(nn.Module):
+class ResNet_v2(nn.Module):
 
     def __init__(self, cfg, block, layers, num_classes=1000, zero_init_residual=False,
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
                  norm_layer=None):
-        super(ResNet, self).__init__()
+        super(ResNet_v2, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
@@ -161,31 +156,20 @@ class ResNet(nn.Module):
         _conv1 = cfg['conv1']
         if _conv1.pool_cfg._ptype=='skip':
             self.conv1 = _conv1._conv2d(3, self.inplanes, kernel_size=7, stride=_conv1.pool_cfg._stride, padding=3, bias=False)
-            self.pool1 = None
+            self.conv1_pool = None
         else:
             self.conv1 = _conv1._conv2d(3, self.inplanes, kernel_size=7, stride=1, padding=3, bias=False)
-            self.pool1 = _conv1.pool_cfg._pool2d(inc=self.inplanes, \
-                                                 kernel_size=_conv1.pool_cfg._ksize, \
-                                                 stride=_conv1.pool_cfg._stride, \
-                                                 padding=_conv1.pool_cfg._padding, \
-                                                 patch_size=_conv1.pool_cfg._psize, \
-                                                 dim_reduced_ratio=_conv1.pool_cfg._dim_reduced_ratio, \
-                                                 num_heads=_conv1.pool_cfg._num_heads, \
-                                                 conv2d=_conv1.pool_cfg._conv2d, \
-                                                 win_norm=_conv1.pool_cfg._win_norm)
+            self.conv1_pool = pooling(self.inplanes, _conv1.pool_cfg)
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
 
         _pool = cfg['pool']
-        self.pool = _pool.pool_cfg._pool2d(inc=self.inplanes, \
-                                           kernel_size=_pool.pool_cfg._ksize, \
-                                           stride=_pool.pool_cfg._stride, \
-                                           padding=_pool.pool_cfg._padding, \
-                                           patch_size=_pool.pool_cfg._psize, \
-                                           dim_reduced_ratio=_pool.pool_cfg._dim_reduced_ratio, \
-                                           num_heads=_pool.pool_cfg._num_heads, \
-                                           conv2d=_pool.pool_cfg._conv2d, \
-                                           win_norm=_pool.pool_cfg._win_norm)
+        if _pool.pool_cfg._ptype=='skip':
+            self.pool = None
+        else:
+            self.pool = pooling(self.inplanes, _pool.pool_cfg)
+
+
         _layer1 = cfg['layer1']
         self.layer1 = self._make_layer(block, 64, layers[0], \
                                        stride=_layer1.pool_cfg._stride, \
@@ -262,9 +246,10 @@ class ResNet(nn.Module):
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
-        if self.pool1 is not None:
-            x = self.pool1(x)
-        x = self.pool(x)
+        if self.conv1_pool is not None:
+            x = self.conv1_pool(x)
+        if self.pool is not None:
+            x = self.pool(x)
 
         x = self.layer1(x)
         x = self.layer2(x)
@@ -279,7 +264,7 @@ class ResNet(nn.Module):
 
 
 def _resnet(arch, cfg, block, layers, pth_file, **kwargs):
-    model = ResNet(cfg, block, layers, **kwargs)
+    model = ResNet_v2(cfg, block, layers, **kwargs)
     if pth_file!=None:
         pretrained_resnet = torch.load(pth_file)
         model_dict = model.state_dict()
@@ -307,7 +292,7 @@ def _resnet(arch, cfg, block, layers, pth_file, **kwargs):
     return model
 
 
-def resnet18(cfg, pth_file=None, **kwargs):
+def resnet18_v2(cfg, pth_file=None, **kwargs):
     """Constructs a ResNet-18 model.
     Args:
         pth_file: pre-trained file root
@@ -316,7 +301,7 @@ def resnet18(cfg, pth_file=None, **kwargs):
                    **kwargs)
 
 
-def resnet34(cfg, pth_file=None, **kwargs):
+def resnet34_v2(cfg, pth_file=None, **kwargs):
     """Constructs a ResNet-34 model.
     Args:
         pth_file: pre-trained file root
@@ -325,7 +310,7 @@ def resnet34(cfg, pth_file=None, **kwargs):
                    **kwargs)
 
 
-def resnet50(cfg, pth_file=None, **kwargs):
+def resnet50_v2(cfg, pth_file=None, **kwargs):
     """Constructs a ResNet-50 model.
     Args:
         pth_file: pre-trained file root
@@ -334,7 +319,7 @@ def resnet50(cfg, pth_file=None, **kwargs):
                    **kwargs)
 
 
-def resnet101(cfg, pth_file=None, **kwargs):
+def resnet101_v2(cfg, pth_file=None, **kwargs):
     """Constructs a ResNet-101 model.
     Args:
         pth_file: pre-trained file root
@@ -343,7 +328,7 @@ def resnet101(cfg, pth_file=None, **kwargs):
                    **kwargs)
 
 
-def resnet152(cfg, pth_file=None, **kwargs):
+def resnet152_v2(cfg, pth_file=None, **kwargs):
     """Constructs a ResNet-152 model.
     Args:
         pth_file: pre-trained file root
@@ -352,7 +337,7 @@ def resnet152(cfg, pth_file=None, **kwargs):
                    **kwargs)
 
 
-def resnext50_32x4d(cfg, pth_file=None, **kwargs):
+def resnext50_32x4d_v2(cfg, pth_file=None, **kwargs):
     """Constructs a ResNeXt-50 32x4d model.
     Args:
         pth_file: pre-trained file root
@@ -363,7 +348,7 @@ def resnext50_32x4d(cfg, pth_file=None, **kwargs):
                    pth_file, **kwargs)
 
 
-def resnext101_32x8d(cfg, pretrained=False, progress=True, **kwargs):
+def resnext101_32x8d_v2(cfg, pretrained=False, progress=True, **kwargs):
     """Constructs a ResNeXt-101 32x8d model.
     Args:
         pth_file: pre-trained file root
