@@ -3,9 +3,9 @@
 /base/logs_new/
 /base/trained_models_ann/
 
-/mmdetection/
-!/mmdetection/RPIXEL/
 
+!/mmdetection/RPIXEL/
+/mmdetection/
 
 *.zip
 *.pyc
