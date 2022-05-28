@@ -3,9 +3,8 @@
 /base/logs_new/
 /base/trained_models_ann/
 
-!/mmdetection/RPIXEL/
 /mmdetection/
-
+!/mmdetection/RPIXEL/
 
 
 *.zip
