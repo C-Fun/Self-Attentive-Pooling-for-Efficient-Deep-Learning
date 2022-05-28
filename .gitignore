@@ -3,7 +3,7 @@
 /base/logs_new/
 /base/trained_models_ann/
 
-mmdetection/
+/mmdetection/
 # !/mmdetection/RPIXEL/
 
 
