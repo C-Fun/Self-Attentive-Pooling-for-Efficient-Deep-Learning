@@ -3,8 +3,8 @@
 
 /mmdetection/
 
-/test/*
-/test/\!b/
+# /test/*
+/test/b/
 
 /base/check_points/
 /base/data/
