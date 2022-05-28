@@ -2,7 +2,9 @@
 *.pyc
 
 /mmdetection/
-\!mmdetection/RPIXEL/
+
+/test/
+!/test/b/
 
 /base/check_points/
 /base/data/
