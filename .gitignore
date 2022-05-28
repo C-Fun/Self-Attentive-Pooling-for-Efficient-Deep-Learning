@@ -3,12 +3,12 @@
 
 /mmdetection/
 
-/*
-!/test/
-/test/*
-!/test/b
-
 /base/check_points/
 /base/data/
 /base/logs_new/
 /base/trained_models_ann/
+
+
+# !/test/
+# /test/*
+# !/test/b
