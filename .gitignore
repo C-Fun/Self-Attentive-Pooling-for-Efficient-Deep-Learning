@@ -1,7 +1,8 @@
 *.zip
 *.pyc
 
-mmdetection/
+/mmdetection/
+\!mmdetection/RPIXEL/
 
 /base/check_points/
 /base/data/
