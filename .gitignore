@@ -4,6 +4,7 @@
 !/mmdetection/
 /mmdetection/*
 !/mmdetection/RPIXEL
+/mmdetection/RPIXEL/_old-version/*
 
 /base/check_points/
 /base/data/
