@@ -8,6 +8,42 @@ from .backbones.resnet import resnet18, resnet50
 from .utils.pool_models.common import *
 from .utils.dynamic_convs.dynamic_conv import Dynamic_conv2d
 
+
+def name_parse(name):
+    cfg = None
+    
+    if name == "resnet50":
+        from .configs.resnet50.base import cfg
+    if name == "resnet50_lip":
+        from .configs.resnet50.lip import cfg
+    if name == "resnet50_gaussian_pool":
+        from .configs.resnet50.gaussian_pool import cfg
+    if name == "resnet50_nlp":
+        from .configs.resnet50.nlp import cfg
+    if name == "resnet50_dfmnlp":
+        from .configs.resnet50.dfmnlp import cfg
+    if name == "resnet50_mixp":
+        from .configs.resnet50.mixp import cfg
+
+    if name == "dyresnet50":
+        from .configs.dyresnet50.base import cfg
+    if name == "dyresnet50_lip":
+        from .configs.dyresnet50.lip import cfg
+    if name == "dyresnet50_gaussian_pool":
+        from .configs.dyresnet50.gaussian_pool import cfg
+    if name == "dyresnet50_nlp":
+        from .configs.dyresnet50.nlp import cfg
+    if name == "dyresnet50_dfmnlp":
+        from .configs.dyresnet50.dfmnlp import cfg
+    if name == "dyresnet50_mixp":
+        from .configs.dyresnet50.mixp import cfg
+
+    if cfg==None:
+        raise Exception("Undefined Network Type!")
+
+    return cfg
+
+
 def pool2d(_ptype):
     if _ptype=='skip':
         return None
@@ -66,34 +102,7 @@ class Config:
         self.pool_cfg = PoolConfig(pool_cfg)
 
 
-def cfg_parse(name):
-    if name == "resnet50":
-        from configs.resnet50.resnet50 import cfg
-    if name == "resnet50_lip":
-        from configs.resnet50.resnet50_lip import cfg
-    if name == "resnet50_gaussian_pool":
-        from configs.resnet50.resnet50_gaussian_pool import cfg
-    if name == "resnet50_nlp":
-        from configs.resnet50.resnet50_nlp import cfg
-    if name == "resnet50_dfmnlp":
-        from configs.resnet50.resnet50_dfmnlp import cfg
-    if name == "resnet50_mixp":
-        from configs.resnet50.resnet50_mixp import cfg
-
-    if name == "dyresnet50":
-        from configs.dyresnet50.dyresnet50 import cfg
-    if name == "dyresnet50_lip":
-        from configs.dyresnet50.dyresnet50_lip import cfg
-    if name == "dyresnet50_gaussian_pool":
-        from configs.dyresnet50.dyresnet50_gaussian_pool import cfg
-    if name == "dyresnet50_nlp":
-        from configs.dyresnet50.dyresnet50_nlp import cfg
-    if name == "dyresnet50_dfmnlp":
-        from configs.dyresnet50.dyresnet50_dfmnlp import cfg
-    if name == "dyresnet50_mixp":
-        from configs.dyresnet50.dyresnet50_mixp import cfg
-    
-
+def cfg_parse(cfg):
     for k in cfg.keys():
         if k=='arch':
             arch = cfg[k]
@@ -103,9 +112,9 @@ def cfg_parse(name):
 
 
 class Network(nn.Module):
-    def __init__(self, name, pth_file=None, **kwargs):
+    def __init__(self, cfg, pth_file=None, **kwargs):
         super(Network, self).__init__()
-        arch, cfg = cfg_parse(name)
+        arch, cfg = cfg_parse(cfg)
 
         # ========== backbone =================
         if arch == 'resnet18':
@@ -124,3 +133,9 @@ class Network(nn.Module):
     def forward(self, x):
         outs = self.net(x)
         return outs
+
+
+class NetworkByName(Network):
+    def __init__(self, name, pth_file=None, **kwargs):
+        cfg = name_parse(name)
+        super(NetworkByName, self).__init__(cfg, pth_file, **kwargs)

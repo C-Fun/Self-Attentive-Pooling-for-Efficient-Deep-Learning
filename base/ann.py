@@ -23,7 +23,7 @@ from pytorch_grad_cam import GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XG
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
-from models.network import Network
+from models.network import NetworkByName as Network
 
 class AverageMeter(object):
 	"""Computes and stores the average and current value"""
@@ -191,12 +191,14 @@ def test(epoch, loader):
 					'state_dict'    : model.state_dict(),
 					'optimizer'     : optimizer.state_dict()
 			}
+
+			ann_path = './trained_models_ann/'+arch_name+'/'
 			try:
-				os.mkdir('./trained_models_ann/')
+				os.makedirs(ann_path)
 			except OSError:
 				pass
 			
-			filename = './trained_models_ann/'+identifier+'.pth'
+			filename = ann_path+identifier+'.pth'
 			if not args.dont_save:
 				torch.save(state,filename)
 		#dis = np.array(dis)
@@ -370,10 +372,10 @@ if __name__ == '__main__':
 	for value in values:
 		lr_interval.append(int(float(value)*args.epochs))
 	
-	
-	log_file = './logs_new/'+architecture.lower().split('_')[0]+'/'
+	arch_name = architecture.lower().split('_')[0]
+	log_file = './logs_new/'+arch_name+'/'
 	try:
-		os.mkdir(log_file)
+		os.makedirs(log_file)
 	except OSError:
 		pass 
 	

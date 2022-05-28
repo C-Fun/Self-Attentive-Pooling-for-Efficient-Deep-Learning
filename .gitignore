@@ -1,10 +1,13 @@
 *.zip
 *.pyc
+*.pth
 
 !/mmdetection/
 /mmdetection/*
-!/mmdetection/RPIXEL
-/mmdetection/RPIXEL/_old-version/*
+!/mmdetection/REPO
+/mmdetection/REPO/_old-version/
+/mmdetection/REPO/analysis/
+/mmdetection/REPO/results/
 
 /base/check_points/
 /base/data/

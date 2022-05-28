@@ -115,11 +115,12 @@ class ResNet(nn.Module):
 
 	def __init__(self, cfg, block, layers, num_classes=1000, zero_init_residual=False,
 				 groups=1, width_per_group=64, replace_stride_with_dilation=None,
-				 norm_layer=None):
+				 norm_layer=None, use_fc_layer=True):
 		super(ResNet, self).__init__()
 		if norm_layer is None:
 			norm_layer = nn.BatchNorm2d
 		self._norm_layer = norm_layer
+		self._use_fc_layer = use_fc_layer
 
 		self.inplanes = 64
 		self.dilation = 1
@@ -201,9 +202,9 @@ class ResNet(nn.Module):
 									   	   conv2d=_layer4._conv2d)
 			self.layer4.add_module('pool', pooling(512 * block.expansion, _layer4.pool_cfg))
 
-
-		self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-		self.fc = nn.Linear(512 * block.expansion, num_classes)
+		if self._use_fc_layer:
+			self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+			self.fc = nn.Linear(512 * block.expansion, num_classes)
 
 		for m in self.modules():
 			if isinstance(m, nn.Conv2d):
@@ -255,16 +256,18 @@ class ResNet(nn.Module):
 		if self.pool is not None:
 			x = self.pool(x)
 
-		x = self.layer1(x)
-		x = self.layer2(x)
-		x = self.layer3(x)
-		x = self.layer4(x)
+		x1 = self.layer1(x)
+		x2 = self.layer2(x1)
+		x3 = self.layer3(x2)
+		x4 = self.layer4(x3)
 
-		x = self.avgpool(x)
-		x = x.reshape(x.size(0), -1)
-		x = self.fc(x)
-
-		return x
+		if self._use_fc_layer:
+			y = self.avgpool(x4)
+			y = y.reshape(y.size(0), -1)
+			y = self.fc(y)
+			return y
+		else:
+			return (x1, x2, x3, x4)
 
 
 def _resnet(arch, cfg, block, layers, pth_file, **kwargs):
