@@ -1,7 +1,7 @@
 *.zip
 *.pyc
 
-/mmdetection/
+mmdetection/
 
 /base/check_points/
 /base/data/
