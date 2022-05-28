@@ -9,6 +9,6 @@
 /base/trained_models_ann/
 
 
-# !/test/
-# /test/*
-# !/test/b
+!/test/
+/test/*
+!/test/b
