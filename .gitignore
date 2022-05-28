@@ -4,7 +4,7 @@
 /mmdetection/
 
 /test/*
-\!/test/b/
+/test/\!b/
 
 /base/check_points/
 /base/data/
