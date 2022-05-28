@@ -30,7 +30,7 @@ model = dict(
 	backbone=dict(
 		type='MyBackBone',
 		name='resnet50',
-		pth_file=root+'/base/check_points/resnet50.pth',
+		pth_file=root+'/check_points/resnet50.pth',
 		use_fc_layer=False
 		),
 	neck=dict(

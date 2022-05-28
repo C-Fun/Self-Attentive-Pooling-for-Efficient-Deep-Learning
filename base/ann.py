@@ -25,6 +25,9 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 
 from models.network import NetworkByName as Network
 
+root = 'E:/留学相关/研究/RPIXEL/' # Windows
+# root = '/nas/home/fangc/' # Linux
+
 class AverageMeter(object):
 	"""Computes and stores the average and current value"""
 	def __init__(self, name, fmt=':f'):
@@ -437,17 +440,17 @@ if __name__ == '__main__':
 		transform_test = transforms.Compose([transforms.ToTensor(), normalize])
 	
 	if dataset == 'CIFAR100':
-		train_dataset   = datasets.CIFAR100(root='./data/cifar_data', train=True, download=True,transform =transform_train)
-		test_dataset    = datasets.CIFAR100(root='./data/cifar_data', train=False, download=True, transform=transform_test)
+		train_dataset   = datasets.CIFAR100(root=root+'/data/cifar_data', train=True, download=True,transform =transform_train)
+		test_dataset    = datasets.CIFAR100(root=root+'/data/cifar_data', train=False, download=True, transform=transform_test)
 
 	elif dataset == 'CIFAR10': 
-		train_dataset   = datasets.CIFAR10(root='./data/cifar_data', train=True, download=True,transform =transform_train)
-		test_dataset    = datasets.CIFAR10(root='./data/cifar_data', train=False, download=True, transform=transform_test)
+		train_dataset   = datasets.CIFAR10(root=root+'/data/cifar_data', train=True, download=True,transform =transform_train)
+		test_dataset    = datasets.CIFAR10(root=root+'/data/cifar_data', train=False, download=True, transform=transform_test)
 	
 	elif dataset == 'MNIST':
-		train_dataset   = datasets.MNIST(root='./data/mnist', train=True, download=True, transform=transforms.ToTensor()
+		train_dataset   = datasets.MNIST(root=root+'/data/mnist', train=True, download=True, transform=transforms.ToTensor()
 			)
-		test_dataset    = datasets.MNIST(root='./data/mnist', train=False, download=True, transform=transforms.ToTensor())
+		test_dataset    = datasets.MNIST(root=root+'/data/mnist', train=False, download=True, transform=transforms.ToTensor())
 	
 	elif dataset == 'IMAGENET':
 		traindir    = os.path.join('/m2/data/imagenet', 'train')
@@ -502,8 +505,8 @@ if __name__ == '__main__':
 						 transforms.ToTensor(),
 						 normalize,
 						 ])
-		train_dataset = datasets.stl10.STL10(root="./data/stl10_data", split="train", download=True, transform=transform_train)
-		test_dataset = datasets.stl10.STL10(root="./data/stl10_data", split="test", download=True, transform=transform_test)
+		train_dataset = datasets.stl10.STL10(root=root+"/data/stl10_data", split="train", download=True, transform=transform_train)
+		test_dataset = datasets.stl10.STL10(root=root+"/data/stl10_data", split="test", download=True, transform=transform_test)
 
 
 	train_loader    = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
