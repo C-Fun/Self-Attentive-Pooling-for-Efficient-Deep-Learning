@@ -5,6 +5,7 @@
 
 
 !/mmdetection/RPIXEL/
+/mmdetection/
 
 *.zip
 *.pyc
