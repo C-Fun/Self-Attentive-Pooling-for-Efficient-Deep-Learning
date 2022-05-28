@@ -1,11 +1,10 @@
+*.zip
+*.pyc
+
+/mmdetection/
+!/mmdetection/RPIXEL/
+
 /base/check_points/
 /base/data/
 /base/logs_new/
 /base/trained_models_ann/
-
-/mmdetection/
-!/mmdetection/RPIXEL/init.sh
-
-
-*.zip
-*.pyc
