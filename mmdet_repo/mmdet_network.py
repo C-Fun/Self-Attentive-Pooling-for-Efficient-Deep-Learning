@@ -11,27 +11,34 @@ def name_parse(name):
 
 	if name=='resnet50':
 		from base.models.configs.resnet50.base import cfg
-	if name=='resnet50_lip':
-		from base.models.configs.resnet50.lip import cfg
-	if name=='resnet50_gaussian_pool':
-		from base.models.configs.resnet50.gaussian_pool import cfg
 	if name=='resnet50_2222':
 		from base.models.configs.resnet50_2222.base import cfg
 	if name=='resnet50_4222':
 		from base.models.configs.resnet50_4222.base import cfg
+	if name=='resnet50_lip':
+		from base.models.configs.resnet50.lip import cfg
+	if name=='resnet50_lip_2222':
+		from base.models.configs.resnet50_2222.lip import cfg
+	if name=='resnet50_lip_4222':
+		from base.models.configs.resnet50_4222.lip import cfg
+	if name=='resnet50_gaussian_pool':
+		from base.models.configs.resnet50.gaussian_pool import cfg
+	if name=='resnet50_gaussian_pool_2222':
+		from base.models.configs.resnet50_2222.gaussian_pool import cfg
+	if name=='resnet50_gaussian_pool_4222':
+		from base.models.configs.resnet50_4222.gaussian_pool import cfg
 
 
 	if name=='dyresnet50':
 		from base.models.configs.dyresnet50.base import cfg
-	if name=='dyresnet50_lip':
-		from base.models.configs.dyresnet50.lip import cfg
-	if name=='dyresnet50_gaussian_pool':
-		from base.models.configs.dyresnet50.gaussian_pool import cfg
 	if name=='dyresnet50_2222':
 		from base.models.configs.dyresnet50_2222.base import cfg
 	if name=='dyresnet50_4222':
 		from base.models.configs.dyresnet50_4222.base import cfg
-
+	if name=='dyresnet50_lip':
+		from base.models.configs.dyresnet50.lip import cfg
+	if name=='dyresnet50_gaussian_pool':
+		from base.models.configs.dyresnet50.gaussian_pool import cfg
 	
 
 	if name=='resnet50_nlp':

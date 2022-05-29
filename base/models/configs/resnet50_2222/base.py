@@ -11,9 +11,7 @@ cfg = {'arch': _arch,
 
 	'pool': {'_conv2d': None,
 			  'pool_cfg': {'_ptype': 'maxp',
-			   				'_ksize': 2,
 			   				'_stride': 2,
-			   				'_padding': 0
 			   			  }
 			  },
 

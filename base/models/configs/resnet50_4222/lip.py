@@ -1,6 +1,6 @@
 _arch = 'resnet50'
 _ctype = 'norm'
-_ptype = 'skip'
+_ptype = 'lip'
 
 cfg = {'arch': _arch,
 	'conv1': {'_conv2d': _ctype,
@@ -17,25 +17,25 @@ cfg = {'arch': _arch,
 
 	'layer1': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			   				 '_stride': 4
+			   				 '_stride': 4,
 			   				}
 			   },
 
 	'layer2': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			   				 '_stride': 2
+			   				 '_stride': 2,
 			   				}
 			   },
 
 	'layer3': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			   				 '_stride': 2
+			   				 '_stride': 2,
 			   				}
 			   },
 
 	'layer4': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			   				 '_stride': 2
+			   				 '_stride': 2,
 			   				}
 			   },
 }

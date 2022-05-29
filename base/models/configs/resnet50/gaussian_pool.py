@@ -11,9 +11,7 @@ cfg = {'arch': _arch,
 
 	'pool': {'_conv2d': None,
 			    'pool_cfg': {'_ptype': 'maxp',
-			    			 '_ksize': 2,
 			   				 '_stride': 2,
-			   				 '_padding': 0,
 			   				}
 			   },
 
@@ -25,25 +23,19 @@ cfg = {'arch': _arch,
 
 	'layer2': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			    			 '_ksize': 2,
 			   				 '_stride': 2,
-			   				 '_padding': 0,
 			   				}
 			   },
 
 	'layer3': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			    			 '_ksize': 2,
 			   				 '_stride': 2,
-			   				 '_padding': 0,
 			   				}
 			   },
 
 	'layer4': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			    			 '_ksize': 2,
 			   				 '_stride': 2,
-			   				 '_padding': 0,
 			   				}
 			   },
 }

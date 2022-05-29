@@ -80,9 +80,9 @@ class PoolConfig:
             cfg['_ptype'] = 'skip'
         self._ptype = cfg['_ptype']
         self._pool2d = pool2d(cfg['_ptype'])
-        self._ksize = cfg['_ksize']
+        self._ksize = cfg['_stride']
         self._stride = cfg['_stride']
-        self._padding = cfg['_padding']
+        self._padding = 0
         self._psize = cfg['_psize']
         self._dim_reduced_ratio = cfg['_dim_reduced_ratio']
         self._num_heads = cfg['_num_heads']
@@ -94,7 +94,7 @@ class Config:
     def __init__(self, cfg):
         self._conv2d = conv2d(cfg['_conv2d'])
 
-        pool_keys = ('_ptype', '_ksize', '_stride', '_padding', '_psize', '_dim_reduced_ratio', '_num_heads', '_conv2d', '_win_norm')
+        pool_keys = ('_ptype', '_stride', '_psize', '_dim_reduced_ratio', '_num_heads', '_conv2d', '_win_norm')
         pool_cfg = cfg['pool_cfg']
         for key in pool_keys:
             if key not in pool_cfg.keys():
