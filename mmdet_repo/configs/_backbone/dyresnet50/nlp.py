@@ -12,9 +12,7 @@ cfg = {'arch': _arch,
 
 	'pool': {'_conv2d': None,
 			    'pool_cfg': {'_ptype': 'maxp',
-			    			 '_ksize': 2,
 			   				 '_stride': 2,
-			   				 '_padding': 0,
 			   				}
 			   },
 
@@ -26,9 +24,8 @@ cfg = {'arch': _arch,
 
 	'layer2': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			    			 '_ksize': 2,
 			   				 '_stride': 2,
-			   				 '_padding': 0,
+
 			   				 '_psize': 16,
 			   				 '_dim_reduced_ratio': 1,
 			   				 '_num_heads': 8,
@@ -39,9 +36,8 @@ cfg = {'arch': _arch,
 
 	'layer3': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			    			 '_ksize': 2,
 			   				 '_stride': 2,
-			   				 '_padding': 0,
+
 			   				 '_psize': 8,
 			   				 '_dim_reduced_ratio': 1,
 			   				 '_num_heads': 16,
@@ -52,9 +48,8 @@ cfg = {'arch': _arch,
 
 	'layer4': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
-			    			 '_ksize': 2,
 			   				 '_stride': 2,
-			   				 '_padding': 0,
+
 			   				 '_psize': 4,
 			   				 '_dim_reduced_ratio': 1,
 			   				 '_num_heads': 32,
