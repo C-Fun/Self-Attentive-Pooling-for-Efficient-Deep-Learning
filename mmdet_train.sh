@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
+MMDET_ROOT='/nas/home/fangc/mmdetection/'
 
 CONFIG=$1
 
-PYTHONPATH="$(dirname $0)/":"$(dirname $0)/mmdetection/":$PYTHONPATH \
-python $(dirname $0)/mmdetection/tools/train.py $CONFIG
+PYTHONPATH="$(dirname $0)/":"$MMDET_ROOT":$PYTHONPATH \
+python $MMDET_ROOT/tools/train.py $CONFIG

@@ -13,8 +13,31 @@
 
 ## MMDetection
 
+Firstly, you need to set your mmdetection library path:
+
 ```shell
-[Non-Local-Pooling]
-> sh mmdet_dist_train.sh ./mmdetection/REPO/configs/network/faster_rcnn/dyresnet50.py 4
+[mmdet_train.sh]
+#!/usr/bin/env bash
+MMDET_ROOT='/nas/home/fangc/mmdetection/' # set your mmdetection library path here
+...
+```
+
+```shell
+[mmdet_dist_train.sh]
+#!/usr/bin/env bash
+MMDET_ROOT='/nas/home/fangc/mmdetection/' # set your mmdetection library path here
+...
+```
+
+
+
+Then, run the shell file as follows:
+
+```shell
+[Non-Local-Pooling/]
+# single-gpu
+> sh mmdet_train.sh ./mmdet_repo/configs/network/faster_rcnn/dyresnet50.py
+# multi-gpu
+> sh mmdet_dist_train.sh ./mmdet_repo/configs/network/faster_rcnn/dyresnet50.py 4
 ```
 

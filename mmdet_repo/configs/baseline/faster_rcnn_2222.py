@@ -1,8 +1,8 @@
-from mmdetection.REPO.configs.common.coco_detection import root as coco_root
+from mmdet_repo.configs.common.coco_detection import root as coco_root
 root = coco_root + '/Non-Local-Pooling/' # linux
 
 try:
-    from mmdetection.REPO.configs.common.coco_detection import classes
+    from mmdet_repo.configs.common.coco_detection import classes
     num_classes = len(classes)
 except:
     print('====================================================')
@@ -14,9 +14,9 @@ runner = dict(type='EpochBasedRunner', max_epochs=12)
 
 # The new config inherits a base config to highlight the necessary modification
 _base_ = [
-	root + '/mmdetection/REPO/configs/common/coco_detection.py',
-	root + '/mmdetection/REPO/configs/common/schedule.py', 
-	root + '/mmdetection/REPO/configs/common/runtime.py',
+	root + '/mmdet_repo/configs/common/coco_detection.py',
+	root + '/mmdet_repo/configs/common/schedule.py', 
+	root + '/mmdet_repo/configs/common/runtime.py',
 ]
 
 # model settings
@@ -26,6 +26,8 @@ model = dict(
 		type='ResNet',
 		depth=50,
 		num_stages=4,
+		# strides=(1, 2, 2, 2),
+		strides=(2, 2, 2, 2),
 		out_indices=(0, 1, 2, 3),
 		frozen_stages=-1,
 		norm_cfg=dict(type='BN', requires_grad=True),
@@ -46,7 +48,8 @@ model = dict(
 			type='AnchorGenerator',
 			scales=[8],
 			ratios=[0.5, 1.0, 2.0],
-			strides=[4, 8, 16, 32, 64]),
+			# strides=[4, 8, 16, 32, 64]),
+			strides=[8, 16, 32, 64, 128]),
 		bbox_coder=dict(
 			type='DeltaXYWHBBoxCoder',
 			target_means=[.0, .0, .0, .0],
@@ -60,7 +63,8 @@ model = dict(
 			type='SingleRoIExtractor',
 			roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
 			out_channels=256,
-			featmap_strides=[4, 8, 16, 32]),
+			# featmap_strides=[4, 8, 16, 32]),
+			featmap_strides=[8, 16, 32, 64]),
 		bbox_head=dict(
 			type='Shared2FCBBoxHead',
 			in_channels=256,

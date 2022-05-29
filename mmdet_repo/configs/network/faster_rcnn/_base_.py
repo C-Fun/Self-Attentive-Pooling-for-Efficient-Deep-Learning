@@ -1,8 +1,8 @@
-from mmdetection.REPO.configs.common.coco_detection import root as coco_root
+from mmdet_repo.configs.common.coco_detection import root as coco_root
 root = coco_root + '/Non-Local-Pooling/' # linux
 
 try:
-    from mmdetection.REPO.configs.common.coco_detection import classes
+    from mmdet_repo.configs.common.coco_detection import classes
     num_classes = len(classes)
 except:
     print('====================================================')
@@ -10,34 +10,33 @@ except:
     print('====================================================')
     num_classes = 80
 
-runner = dict(type='EpochBasedRunner', max_epochs=12)
-
 # The new config inherits a base config to highlight the necessary modification
 _base_ = [
-	root + '/mmdetection/REPO/configs/common/coco_detection.py',
-	root + '/mmdetection/REPO/configs/common/schedule.py', 
-	root + '/mmdetection/REPO/configs/common/runtime.py',
+	root + '/mmdet_repo/configs/common/coco_detection.py',
+	root + '/mmdet_repo/configs/common/schedule.py', 
+	root + '/mmdet_repo/configs/common/runtime.py',
 ]
+
+
+# import my net
+custom_imports = dict(
+	imports=['mmdet_repo.mmdet_network'],
+	allow_failed_imports=False
+	)
 
 # model settings
 model = dict(
 	type='FasterRCNN',
 	backbone=dict(
-		type='ResNet',
-		depth=50,
-		num_stages=4,
-		# strides=(1, 2, 2, 2),
-		strides=(2, 2, 2, 2),
-		out_indices=(0, 1, 2, 3),
-		frozen_stages=-1,
-		norm_cfg=dict(type='BN', requires_grad=True),
-		norm_eval=False,
-		style='pytorch',
-		init_cfg=dict(type='Pretrained', checkpoint='torchvision://resnet50')
+		type='MyBackBone',
+		name='resnet50',
+		pth_file=root+'/check_points/resnet50.pth',
+		use_fc_layer=False
 		),
 	neck=dict(
 		type='FPN',
-		in_channels=[256, 512, 1024, 2048],
+		in_channels=[256, 512, 1024, 2048], # resnet50
+		# in_channels=[64, 128, 256, 512], # resnet18
 		out_channels=256,
 		num_outs=5),
 	rpn_head=dict(
@@ -48,8 +47,7 @@ model = dict(
 			type='AnchorGenerator',
 			scales=[8],
 			ratios=[0.5, 1.0, 2.0],
-			# strides=[4, 8, 16, 32, 64]),
-			strides=[8, 16, 32, 64, 128]),
+			strides=[4, 8, 16, 32, 64]),
 		bbox_coder=dict(
 			type='DeltaXYWHBBoxCoder',
 			target_means=[.0, .0, .0, .0],
@@ -63,8 +61,7 @@ model = dict(
 			type='SingleRoIExtractor',
 			roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
 			out_channels=256,
-			# featmap_strides=[4, 8, 16, 32]),
-			featmap_strides=[8, 16, 32, 64]),
+			featmap_strides=[4, 8, 16, 32]),
 		bbox_head=dict(
 			type='Shared2FCBBoxHead',
 			in_channels=256,
@@ -152,9 +149,3 @@ except:
 	    samples_per_gpu=2,
 	    workers_per_gpu=2,
 	    )
-
-
-# We can use the pre-trained Mask RCNN model to obtain higher performance
-#load_from = 'checkpoints/mask_rcnn_r50_caffe_fpn_mstrain-poly_3x_coco_bbox_mAP-0.408__segm_mAP-0.37_20200504_163245-42aa3d00.pth'
-
-# log_config = dict(interval=100, hooks=[dict(type='TextLoggerHook')])

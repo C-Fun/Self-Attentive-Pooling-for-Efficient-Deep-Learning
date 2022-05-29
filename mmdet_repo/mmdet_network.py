@@ -1,6 +1,5 @@
 import torch.nn as nn
 import torch.utils.checkpoint as cp
-from mmcv.cnn import build_conv_layer, build_norm_layer, build_plugin_layer
 from mmcv.runner import BaseModule
 
 from mmdet.models.builder import BACKBONES
@@ -36,9 +35,9 @@ def name_parse(name):
 	
 
 	if name=='resnet50_nlp':
-		from mmdetection.REPO.configs._backbone.resnet50.nlp import cfg
+		from mmdet_repo.configs._backbone.resnet50.nlp import cfg
 	if name=='dyresnet50_nlp':
-		from mmdetection.REPO.configs._backbone.dyresnet50.nlp import cfg
+		from mmdet_repo.configs._backbone.dyresnet50.nlp import cfg
 
 
 	if cfg==None:
@@ -48,12 +47,11 @@ def name_parse(name):
 
 
 @BACKBONES.register_module()
-class MyBackBone(BaseModule):
+class MyBackBone(Network, BaseModule):
 	def __init__(self, name, pth_file=None, **kwargs):
-		super(MyBackBone, self).__init__()
 		cfg = name_parse(name)
+		super(MyBackBone, self).__init__(cfg, pth_file=pth_file, **kwargs)
 
-		self.net = Network(cfg, pth_file=pth_file, **kwargs)
 	def forward(self, x):
 		outs = self.net(x)
 		# for i,out in enumerate(outs):

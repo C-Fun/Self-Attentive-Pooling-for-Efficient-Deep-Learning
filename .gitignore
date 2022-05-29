@@ -6,11 +6,5 @@
 
 /work_dirs/
 
-!/mmdetection/
-/mmdetection/*
-!/mmdetection/REPO
-/mmdetection/REPO/analysis/
-/mmdetection/REPO/results/
-
 /base/logs_new/
 /base/trained_models_ann/

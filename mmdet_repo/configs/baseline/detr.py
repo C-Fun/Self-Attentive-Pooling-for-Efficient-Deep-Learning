@@ -1,8 +1,8 @@
-from mmdetection.REPO.configs.common.coco_detection import root as coco_root
+from mmdet_repo.configs.common.coco_detection import root as coco_root
 root = coco_root + '/Non-Local-Pooling/' # linux
 
 try:
-	from mmdetection.REPO.configs.common.coco_detection import classes
+	from mmdet_repo.configs.common.coco_detection import classes
 	num_classes = len(classes)
 except:
 	print('====================================================')
@@ -17,8 +17,8 @@ runner = dict(type='EpochBasedRunner', max_epochs=150)
 
 # The new config inherits a base config to highlight the necessary modification
 _base_ = [
-	root + '/mmdetection/REPO/configs/common/coco_detection.py', 
-	root + '/mmdetection/REPO/configs/common/runtime.py',
+	root + '/mmdet_repo/configs/common/coco_detection.py', 
+	root + '/mmdet_repo/configs/common/runtime.py',
 ]
 # model settings
 model = dict(
