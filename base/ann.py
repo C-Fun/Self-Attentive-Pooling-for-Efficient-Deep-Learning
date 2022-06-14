@@ -321,9 +321,12 @@ if __name__ == '__main__':
 	# parser.add_argument('--log',                    action='store_true',                        help='to print the output on terminal or to log file')
 	parser.add_argument('-a','--architecture',      default='VGG16',            type=str,       help='network architecture', choices=['RESNET50', 'RESNET50_LIP', 'RESNET50_GAUSSIAN_POOL', 'RESNET50_NLP', 
 																																	  'RESNET50_DFMNLP', 'RESNET50_MIXP',
+																																	  'RESNET50_GAUSSIAN_POOL_2222',
+																																	  'RESNET50_NLP_REDUCED',
 
 																																	  'DYRESNET50', 'DYRESNET50_LIP', 'DYRESNET50_GAUSSIAN_POOL', 'DYRESNET50_NLP', 
-																																	  'DYRESNET50_DFMNLP', 'DYRESNET50_MIXP',])
+																																	  'DYRESNET50_DFMNLP', 'DYRESNET50_MIXP',
+																																	  'DYRESNET50_NLP_REDUCED',])
 	parser.add_argument('--im_size',                 default=None,             type=int,         help='image size')
 	parser.add_argument('-rthr','--relu_threshold', default='4.0',            type=float,       help='threshold value for the RELU activation')
 	parser.add_argument('-lr','--learning_rate',    default=1e-2,               type=float,     help='initial learning_rate')

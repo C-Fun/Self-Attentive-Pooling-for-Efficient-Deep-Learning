@@ -18,8 +18,12 @@ def name_parse(name):
         from .configs.resnet50.lip import cfg
     if name == "resnet50_gaussian_pool":
         from .configs.resnet50.gaussian_pool import cfg
+    if name == "resnet50_gaussian_pool_2222":
+        from .configs.resnet50_2222.gaussian_pool import cfg
     if name == "resnet50_nlp":
         from .configs.resnet50.nlp import cfg
+    if name == "resnet50_nlp_reduced":
+        from .configs.resnet50.nlp_reduced import cfg
     if name == "resnet50_dfmnlp":
         from .configs.resnet50.dfmnlp import cfg
     if name == "resnet50_mixp":
@@ -33,6 +37,8 @@ def name_parse(name):
         from .configs.dyresnet50.gaussian_pool import cfg
     if name == "dyresnet50_nlp":
         from .configs.dyresnet50.nlp import cfg
+    if name == "dyresnet50_nlp_reduced":
+        from .configs.dyresnet50.nlp_reduced import cfg
     if name == "dyresnet50_dfmnlp":
         from .configs.dyresnet50.dfmnlp import cfg
     if name == "dyresnet50_mixp":
@@ -59,6 +65,8 @@ def pool2d(_ptype):
         return nlp2d
     elif _ptype=='dfm_nlp':
         return dfm_nlp2d
+    elif _ptype=='dfmixp':
+        return dfmixp2d
     elif _ptype=='mixp':
         return mixp2d
     else:

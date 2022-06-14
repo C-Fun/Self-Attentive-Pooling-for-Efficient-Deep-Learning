@@ -5,15 +5,10 @@ _base_ = [root + '/mmdet_repo/configs/network/faster_rcnn/_base_.py']
 
 model = dict(
 	backbone=dict(
-		name='resnet50_4222',
+		name='dyresnet18',
+		pth_file=root+'/check_points/resnet18.pth',
 		),
-	rpn_head=dict(
-		anchor_generator=dict(
-			strides=[16, 32, 64, 128, 256]),
-		),
-	roi_head=dict(
-		bbox_roi_extractor=dict(
-			featmap_strides=[16, 32, 64, 128]
-			),
-		),
+	neck=dict(
+		in_channels=[64, 128, 256, 512], # resnet18
+		)
 	)
