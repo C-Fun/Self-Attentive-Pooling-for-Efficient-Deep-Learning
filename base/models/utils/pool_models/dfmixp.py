@@ -10,7 +10,7 @@ from .position_encoding import NestedTensor
 
 class DFMIXP_BASE(NLP_BASE):
 	def __init__(self, in_channels, patch_size=2, dim_reduced_ratio=1.0, num_heads=2, position_embedding='learned', conv2d=nn.Conv2d):
-		super(DFMNLP_BASE, self).__init__(in_channels, patch_size, dim_reduced_ratio, num_heads, position_embedding, conv2d)
+		super(DFMIXP_BASE, self).__init__(in_channels, patch_size, dim_reduced_ratio, num_heads, position_embedding, conv2d)
 		self.offset_conv = OffsetConv2d(inc=self.in_channels, kernel_size=self.patch_size, stride=self.patch_size, conv2d=conv2d)
 		self.downsample = nn.Sequential(
 							DeformConv2d(self.in_channels, self.embed_dim, kernel_size=self.patch_size, stride=self.patch_size, padding=0, modulation=True, conv2d=conv2d),

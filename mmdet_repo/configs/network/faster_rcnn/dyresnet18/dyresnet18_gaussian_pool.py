@@ -8,3 +8,8 @@ model = dict(
 		name='dyresnet18_gaussian_pool',
 		),
 	)
+
+data = dict(
+    samples_per_gpu=1,
+    workers_per_gpu=1,
+    )
