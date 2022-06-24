@@ -1,7 +1,6 @@
-_arch = 'resnet50'
-_ctype = 'dynamic'
-_ptype = 'mixp'
-_win_norm = True
+_arch = 'resnet18_v2'
+_ctype = 'norm'
+_ptype = 'gaussian_pool'
 
 cfg = {'arch': _arch,
 	'conv1': {'_conv2d': _ctype,
@@ -17,44 +16,26 @@ cfg = {'arch': _arch,
 			   },
 
 	'layer1': {'_conv2d': _ctype,
-			    'pool_cfg': {'_ptype': 'skip',
-			   				 '_stride': 1,
+			    'pool_cfg': {'_ptype': _ptype,
+			   				 '_stride': 2,
 			   				}
 			   },
 
 	'layer2': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
 			   				 '_stride': 2,
-
-			   				 '_psize': 4,
-			   				 '_dim_reduced_ratio': 1,
-			   				 '_num_heads': 8,
-			   				 '_conv2d': _ctype,
-			   				 '_win_norm': _win_norm
 			   				}
 			   },
 
 	'layer3': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
 			   				 '_stride': 2,
-
-			   				 '_psize': 2,
-			   				 '_dim_reduced_ratio': 1,
-			   				 '_num_heads': 16,
-			   				 '_conv2d': _ctype,
-			   				 '_win_norm': _win_norm
 			   				}
 			   },
 
 	'layer4': {'_conv2d': _ctype,
 			    'pool_cfg': {'_ptype': _ptype,
 			   				 '_stride': 2,
-
-			   				 '_psize': 1,
-			   				 '_dim_reduced_ratio': 1,
-			   				 '_num_heads': 32,
-			   				 '_conv2d': _ctype,
-			   				 '_win_norm': _win_norm
 			   				}
 			   },
 }

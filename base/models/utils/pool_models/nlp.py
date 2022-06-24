@@ -51,7 +51,7 @@ class NLP_BASE(nn.Module):
 
 		attn_seq, attn_weights = self.multihead_attn(embed, embed, embed)
 		attn = rearrange(attn_seq, 'b (h w) c -> b c h w', h=h//p, w=w//p)
-		attn = self.restore(F.interpolate(attn, size=(h,w), mode='nearest'))
+		attn = self.restore(F.interpolate(attn, size=(h,w), mode='nearest')) 
 
 		weight = torch.exp(attn)
 		return weight

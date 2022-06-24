@@ -1,4 +1,4 @@
-_arch = 'resnet50'
+_arch = 'resnet18'
 _ctype = 'dynamic'
 _ptype = 'dfm_nlp'
 _win_norm = True

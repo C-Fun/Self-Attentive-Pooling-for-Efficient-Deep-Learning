@@ -1,6 +1,6 @@
-_arch = 'resnet50'
-_ctype = 'dynamic'
-_ptype = 'dfm_nlp'
+_arch = 'resnet18'
+_ctype = 'norm'
+_ptype = 'nlp'
 _win_norm = True
 
 cfg = {'arch': _arch,

@@ -11,15 +11,49 @@ from .utils.dynamic_convs.dynamic_conv import Dynamic_conv2d
 
 def name_parse(name):
     cfg = None
+    # ==== resnet18 1222 ==== #
+    if name == "resnet18":
+        from .configs.resnet18.base import cfg
+    if name == "resnet18_lip":
+        from .configs.resnet18.lip import cfg
+    if name == "resnet18_gaussian_pool":
+        from .configs.resnet18.gaussian_pool import cfg
+    if name == "resnet18_nlp":
+        from .configs.resnet18.nlp import cfg
+    if name == "resnet18_dfmnlp":
+        from .configs.resnet18.dfmnlp import cfg
+
+    # ==== resnet18 2222 ==== #
+    if name == "resnet18_2222":
+        from .configs.resnet18_2222.base import cfg
+    if name == "resnet18_lip_2222":
+        from .configs.resnet18_2222.lip import cfg
+    if name == "resnet18_gaussian_pool_2222":
+        from .configs.resnet18_2222.gaussian_pool import cfg
+    if name == "resnet18_nlp_2222":
+        from .configs.resnet18_2222.nlp import cfg
+    if name == "resnet18_dfmnlp_2222":
+        from .configs.resnet18_2222.dfmnlp import cfg
+
+    # ==== resnet18 4222 ==== #
+    if name == "resnet18_4222":
+        from .configs.resnet18_4222.base import cfg
+    if name == "resnet18_lip_4222":
+        from .configs.resnet18_4222.lip import cfg
+    if name == "resnet18_gaussian_pool_4222":
+        from .configs.resnet18_4222.gaussian_pool import cfg
+    if name == "resnet18_nlp_4222":
+        from .configs.resnet18_4222.nlp import cfg
+    if name == "resnet18_dfmnlp_4222":
+        from .configs.resnet18_4222.dfmnlp import cfg
     
+    # ==== resnet50 1222 ==== #
     if name == "resnet50":
         from .configs.resnet50.base import cfg
     if name == "resnet50_lip":
         from .configs.resnet50.lip import cfg
     if name == "resnet50_gaussian_pool":
         from .configs.resnet50.gaussian_pool import cfg
-    if name == "resnet50_gaussian_pool_2222":
-        from .configs.resnet50_2222.gaussian_pool import cfg
     if name == "resnet50_nlp":
         from .configs.resnet50.nlp import cfg
     if name == "resnet50_nlp_reduced":
@@ -29,6 +63,69 @@ def name_parse(name):
     if name == "resnet50_mixp":
         from .configs.resnet50.mixp import cfg
 
+    # ==== resnet50 2222 ==== #
+    if name == "resnet50_2222":
+        from .configs.resnet50_2222.base import cfg
+    if name == "resnet50_lip_2222":
+        from .configs.resnet50_2222.lip import cfg
+    if name == "resnet50_gaussian_pool_2222":
+        from .configs.resnet50_2222.gaussian_pool import cfg
+    if name == "resnet50_nlp_2222":
+        from .configs.resnet50_2222.nlp import cfg
+    if name == "resnet50_dfmnlp_2222":
+        from .configs.resnet50_2222.dfmnlp import cfg
+
+    # ==== resnet50 4222 ==== #
+    if name == "resnet50_4222":
+        from .configs.resnet50_4222.base import cfg
+    if name == "resnet50_lip_4222":
+        from .configs.resnet50_4222.lip import cfg
+    if name == "resnet50_gaussian_pool_4222":
+        from .configs.resnet50_4222.gaussian_pool import cfg
+    if name == "resnet50_nlp_4222":
+        from .configs.resnet50_4222.nlp import cfg
+    if name == "resnet50_dfmnlp_4222":
+        from .configs.resnet50_4222.dfmnlp import cfg
+
+
+    # ==== dyresnet18 1222 ==== #
+    if name == "dyresnet18":
+        from .configs.dyresnet18.base import cfg
+    if name == "dyresnet18_lip":
+        from .configs.dyresnet18.lip import cfg
+    if name == "dyresnet18_gaussian_pool":
+        from .configs.dyresnet18.gaussian_pool import cfg
+    if name == "dyresnet18_nlp":
+        from .configs.dyresnet18.nlp import cfg
+    if name == "dyresnet18_dfmnlp":
+        from .configs.dyresnet18.dfmnlp import cfg
+
+    # ==== dyresnet18 2222 ==== #
+    if name == "dyresnet18_2222":
+        from .configs.dyresnet18_2222.base import cfg
+    if name == "dyresnet18_lip_2222":
+        from .configs.dyresnet18_2222.lip import cfg
+    if name == "dyresnet18_gaussian_pool_2222":
+        from .configs.dyresnet18_2222.gaussian_pool import cfg
+    if name == "dyresnet18_nlp_2222":
+        from .configs.dyresnet18_2222.nlp import cfg
+    if name == "dyresnet18_dfmnlp_2222":
+        from .configs.dyresnet18_2222.dfmnlp import cfg
+
+    # ==== dyresnet18 4222 ==== #
+    if name == "dyresnet18_4222":
+        from .configs.dyresnet18_4222.base import cfg
+    if name == "dyresnet18_lip_4222":
+        from .configs.dyresnet18_4222.lip import cfg
+    if name == "dyresnet18_gaussian_pool_4222":
+        from .configs.dyresnet18_4222.gaussian_pool import cfg
+    if name == "dyresnet18_nlp_4222":
+        from .configs.dyresnet18_4222.nlp import cfg
+    if name == "dyresnet18_dfmnlp_4222":
+        from .configs.dyresnet18_4222.dfmnlp import cfg
+
+
+    # ==== dyresnet50 1222 ==== #
     if name == "dyresnet50":
         from .configs.dyresnet50.base import cfg
     if name == "dyresnet50_lip":
@@ -43,6 +140,30 @@ def name_parse(name):
         from .configs.dyresnet50.dfmnlp import cfg
     if name == "dyresnet50_mixp":
         from .configs.dyresnet50.mixp import cfg
+    
+    # ==== dyresnet50 2222 ==== #
+    if name == "dyresnet50_2222":
+        from .configs.dyresnet50_2222.base import cfg
+    if name == "dyresnet50_lip_2222":
+        from .configs.dyresnet50_2222.lip import cfg
+    if name == "dyresnet50_gaussian_pool_2222":
+        from .configs.dyresnet50_2222.gaussian_pool import cfg
+    if name == "dyresnet50_nlp_2222":
+        from .configs.dyresnet50_2222.nlp import cfg
+    if name == "dyresnet50_dfmnlp_2222":
+        from .configs.dyresnet50_2222.dfmnlp import cfg
+
+    # ==== dyresnet50 4222 ==== #
+    if name == "dyresnet50_4222":
+        from .configs.dyresnet50_4222.base import cfg
+    if name == "dyresnet50_lip_4222":
+        from .configs.dyresnet50_4222.lip import cfg
+    if name == "dyresnet50_gaussian_pool_4222":
+        from .configs.dyresnet50_4222.gaussian_pool import cfg
+    if name == "dyresnet50_nlp_4222":
+        from .configs.dyresnet50_4222.nlp import cfg
+    if name == "dyresnet50_dfmnlp_4222":
+        from .configs.dyresnet50_4222.dfmnlp import cfg
 
     if cfg==None:
         raise Exception("Undefined Network Type!")

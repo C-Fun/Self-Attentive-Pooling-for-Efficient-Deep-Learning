@@ -1,5 +1,5 @@
-_arch = 'resnet50'
-_ctype = 'dynamic'
+_arch = 'resnet18'
+_ctype = 'norm'
 _ptype = 'dfm_nlp'
 _win_norm = True
 

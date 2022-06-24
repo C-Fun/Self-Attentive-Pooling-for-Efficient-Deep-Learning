@@ -1,5 +1,5 @@
-_arch = 'resnet50'
-_ctype = 'dynamic'
+_arch = 'resnet18'
+_ctype = 'norm'
 _ptype = 'dfm_nlp'
 _win_norm = True
 
@@ -17,8 +17,14 @@ cfg = {'arch': _arch,
 			   },
 
 	'layer1': {'_conv2d': _ctype,
-			    'pool_cfg': {'_ptype': 'skip',
-			   				 '_stride': 1,
+			    'pool_cfg': {'_ptype': _ptype,
+			   				 '_stride': 4,
+
+			   				 '_psize': 1,
+			   				 '_dim_reduced_ratio': 1,
+			   				 '_num_heads': 4,
+			   				 '_conv2d': _ctype,
+			   				 '_win_norm': _win_norm
 			   				}
 			   },
 
