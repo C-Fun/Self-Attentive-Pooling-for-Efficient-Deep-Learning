@@ -340,7 +340,7 @@ if __name__ == '__main__':
 
 	args=parser.parse_args()
 
-	os.environ['CUDA_VISIBLE_DEVICES'] = args.devices
+	# os.environ['CUDA_VISIBLE_DEVICES'] = args.devices
 
 	# Seed random number
 	torch.manual_seed(args.seed)
