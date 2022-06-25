@@ -7,6 +7,12 @@
           <mappings>
             <mapping deploy="/Non-Local-Pooling" local="$PROJECT_DIR$" web="/" />
           </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/base/trained_models_ann" />
+            <excludedPath path="/Non-Local-Pooling/base/trained_models_ann" />
+            <excludedPath local="true" path="$PROJECT_DIR$/work_dirs" />
+            <excludedPath path="/Non-Local-Pooling/work_dirs" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>

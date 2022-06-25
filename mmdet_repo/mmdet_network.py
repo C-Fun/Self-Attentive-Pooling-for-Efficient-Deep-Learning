@@ -15,6 +15,19 @@ def name_parse(name):
 	if name=='resnet18_gaussian_pool':
 		from base.models.configs.resnet18.gaussian_pool import cfg
 
+	if name=='resnet18_nlp':
+		from base.models.configs.resnet18.nlp import cfg
+	if name=='resnet18_nlp_2222':
+		from base.models.configs.resnet18_2222.nlp import cfg
+	if name=='resnet18_nlp_4222':
+		from base.models.configs.resnet18_4222.nlp import cfg
+	if name=='resnet18_dfmnlp':
+		from base.models.configs.resnet18.dfmnlp import cfg
+	if name=='resnet18_dfmnlp_2222':
+		from base.models.configs.resnet18_2222.dfmnlp import cfg
+	if name=='resnet18_dfmnlp_4222':
+		from base.models.configs.resnet18_4222.dfmnlp import cfg
+
 	if name=='resnet18_dfmnlp_reduced':
 		from base.models.configs.resnet18.dfmnlp_reduced import cfg
 	if name=='resnet18_dfmixp_reduced':
@@ -31,6 +44,19 @@ def name_parse(name):
 		from base.models.configs.dyresnet18.lip import cfg
 	if name=='dyresnet18_gaussian_pool':
 		from base.models.configs.dyresnet18.gaussian_pool import cfg
+
+	if name=='dyresnet18_nlp':
+		from base.models.configs.dyresnet18.nlp import cfg
+	if name=='dyresnet18_nlp_2222':
+		from base.models.configs.dyresnet18_2222.nlp import cfg
+	if name=='dyresnet18_nlp_4222':
+		from base.models.configs.dyresnet18_4222.nlp import cfg
+	if name=='dyresnet18_dfmnlp':
+		from base.models.configs.dyresnet18.dfmnlp import cfg
+	if name=='dyresnet18_dfmnlp_2222':
+		from base.models.configs.dyresnet18_2222.dfmnlp import cfg
+	if name=='dyresnet18_dfmnlp_4222':
+		from base.models.configs.dyresnet18_4222.dfmnlp import cfg
 
 	if name=='dyresnet18_dfmnlp_reduced':
 		from base.models.configs.dyresnet18.dfmnlp_reduced import cfg
@@ -61,6 +87,19 @@ def name_parse(name):
 	if name=='resnet50_gaussian_pool_4222':
 		from base.models.configs.resnet50_4222.gaussian_pool import cfg
 
+	if name=='resnet50_nlp':
+		from base.models.configs.resnet50.nlp import cfg
+	if name=='resnet50_nlp_2222':
+		from base.models.configs.resnet50_2222.nlp import cfg
+	if name=='resnet50_nlp_4222':
+		from base.models.configs.resnet50_4222.nlp import cfg
+	if name=='resnet50_dfmnlp':
+		from base.models.configs.resnet50.dfmnlp import cfg
+	if name=='resnet50_dfmnlp_2222':
+		from base.models.configs.resnet50_2222.dfmnlp import cfg
+	if name=='resnet50_dfmnlp_4222':
+		from base.models.configs.resnet50_4222.dfmnlp import cfg
+
 
 	if name=='dyresnet50':
 		from base.models.configs.dyresnet50.base import cfg
@@ -80,6 +119,19 @@ def name_parse(name):
 		from base.models.configs.dyresnet50_2222.gaussian_pool import cfg
 	if name=='dyresnet50_gaussian_pool_4222':
 		from base.models.configs.dyresnet50_4222.gaussian_pool import cfg
+
+	if name=='dyresnet50_nlp':
+		from base.models.configs.dyresnet50.nlp import cfg
+	if name=='dyresnet50_nlp_2222':
+		from base.models.configs.dyresnet50_2222.nlp import cfg
+	if name=='dyresnet50_nlp_4222':
+		from base.models.configs.dyresnet50_4222.nlp import cfg
+	if name=='dyresnet50_dfmnlp':
+		from base.models.configs.dyresnet50.dfmnlp import cfg
+	if name=='dyresnet50_dfmnlp_2222':
+		from base.models.configs.dyresnet50_2222.dfmnlp import cfg
+	if name=='dyresnet50_dfmnlp_4222':
+		from base.models.configs.dyresnet50_4222.dfmnlp import cfg
 
 
 	if name=='resnet50_nlp_reduced':
