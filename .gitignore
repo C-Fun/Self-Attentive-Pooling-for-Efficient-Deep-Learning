@@ -2,7 +2,7 @@
 *.pyc
 *.pth
 
-/idea/
+/.idea/
 /check_points/
 
 /work_dirs/
