@@ -378,7 +378,7 @@ if __name__ == '__main__':
 	except OSError:
 		pass 
 	
-	identifier = 'ann_'+architecture.lower()+'_'+dataset.lower()+'_'+str(threshold)+'_'+str(dropout)+'true_imagenet'
+	identifier = 'ann_'+architecture.lower()+'_'+dataset.lower()
 	log_file+=identifier+'.log'
 	
 	if args.log:
