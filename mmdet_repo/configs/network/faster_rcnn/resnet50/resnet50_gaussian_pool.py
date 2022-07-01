@@ -5,6 +5,6 @@ _base_ = [root + '/mmdet_repo/configs/network/faster_rcnn/resnet50/resnet50.py']
 
 model = dict(
 	backbone=dict(
-		name='resnet50_gaussian_pool',
+		name='resnet50_v2-gaussian_pool-1222',
 		)
 	)

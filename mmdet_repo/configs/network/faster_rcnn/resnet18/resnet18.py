@@ -5,7 +5,7 @@ _base_ = [root + '/mmdet_repo/configs/network/faster_rcnn/_base_.py']
 
 model = dict(
 	backbone=dict(
-		name='resnet18',
+		name='resnet18-skip-1222',
 		pth_file=root+'/check_points/resnet18.pth',
 		),
 	neck=dict(
