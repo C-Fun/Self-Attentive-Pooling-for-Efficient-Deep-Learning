@@ -489,7 +489,14 @@ if __name__ == '__main__':
 	model_cfg = name_parse(arch_name)
 	model_json = json.dumps(model_cfg, sort_keys=False, indent=4, separators=(',', ': '))
 
-	folder_name = '-'.join(arch_name.split('-')[:-3] + [arch_name.split('-')[-3].split('_')[0]])
+	arch_name_list = arch_name.split('-')
+	backbone_name = arch_name_list[-3].split('_')[0]
+	if len(arch_name_list)==3:
+		folder_name = backbone_name
+	elif len(arch_name_list)==6:
+		folder_name = '-'.join([arch_name_list[0], backbone_name])
+	else:
+		folder_name = '-'.join(['unknown', backbone_name])
 	log_file = './logs_new/' + folder_name + '/'
 	try:
 		os.makedirs(log_file)
