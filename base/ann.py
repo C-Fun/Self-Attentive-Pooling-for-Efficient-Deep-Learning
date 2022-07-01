@@ -23,7 +23,7 @@ from pytorch_grad_cam import GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XG
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
 from pytorch_grad_cam.utils.image import show_cam_on_image
 
-from models.network import NetworkByName as Network
+from models.network import Network, name_parse
 
 # root = 'E:/留学相关/研究/RPIXEL/' # Windows
 root = '/nas/home/fangc/' # Linux
@@ -365,36 +365,6 @@ if __name__ == '__main__':
 	threshold       = args.relu_threshold
 	weight_decay    = args.weight_decay
 	amsgrad         = args.amsgrad
-
-	values = args.lr_interval.split()
-	lr_interval = []
-	for value in values:
-		lr_interval.append(int(float(value)*args.epochs))
-	
-	arch_name = architecture.lower().split('_')[0]
-	log_file = './logs_new/'+arch_name+'/'
-	try:
-		os.makedirs(log_file)
-	except OSError:
-		pass 
-	
-	identifier = 'ann_'+architecture.lower()+'_'+dataset.lower()
-	log_file+=identifier+'.log'
-	
-	if args.log:
-		f= open(log_file, 'w', buffering=1)
-	else:
-		f=sys.stdout
-	
-	
-	f.write('\n Run on time: {}'.format(datetime.datetime.now()))
-			
-	f.write('\n\n Arguments:')
-	for arg in vars(args):
-		if arg == 'lr_interval':
-			f.write('\n\t {:20} : {}'.format(arg, lr_interval))
-		else:
-			f.write('\n\t {:20} : {}'.format(arg, getattr(args,arg)))
 		
 	# Training settings
 	#if torch.cuda.is_available() and args.gpu:
@@ -509,16 +479,51 @@ if __name__ == '__main__':
 	
 	test_loader     = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
+	# logs out
+	values = args.lr_interval.split()
+	lr_interval = []
+	for value in values:
+		lr_interval.append(int(float(value) * args.epochs))
 
+	arch_name = architecture.lower()
+	model_cfg = name_parse(arch_name)
+	model_json = json.dumps(model_cfg, sort_keys=False, indent=4, separators=(',', ': '))
+
+	folder_name = '-'.join(arch_name.split('-')[:-3] + [arch_name.split('-')[-3].split('_')[0]])
+	log_file = './logs_new/' + folder_name + '/'
+	try:
+		os.makedirs(log_file)
+	except OSError:
+		pass
+
+	identifier = arch_name + '_' + dataset.lower() + '_imsize' + str(im_size)
+	log_file += identifier + '.log'
+
+	if args.log:
+		f = open(log_file, 'w', buffering=1)
+	else:
+		f = sys.stdout
+
+	f.write('\n Run on time: {}'.format(datetime.datetime.now()))
+
+	f.write('\n\n Architecture: {}'.format(arch_name))
+	f.write('\n\n Pool Config: {}'.format(model_json))
+
+	f.write('\n\n Arguments:')
+	for arg in vars(args):
+		if arg == 'lr_interval':
+			f.write('\n\t {:20} : {}'.format(arg, lr_interval))
+		else:
+			f.write('\n\t {:20} : {}'.format(arg, getattr(args, arg)))
+
+
+	# prepare model
 	if args.pretrained_backbone:
 		pth_file = args.pretrained_backbone
 	else:
 		pth_file = None
 
-
-	model_name = args.architecture.lower()
-
-	model = Network(model_name, num_classes=labels, pth_file=pth_file)
+	model = Network(model_cfg, num_classes=labels, pth_file=pth_file)
 
 	device_ids = [id for id in range(len(args.devices.split(',')))]
 	model = nn.DataParallel(model, device_ids=device_ids)

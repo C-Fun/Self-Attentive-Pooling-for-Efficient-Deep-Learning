@@ -41,20 +41,25 @@ class BasicBlock(nn.Module):
         if dilation > 1:
             raise NotImplementedError("Dilation > 1 not supported in BasicBlock")
         # Both self.conv1 and self.downsample layers downsample the input when stride != 1
-        if stride > 1 and pool_cfg._ptype == 'skip':
-            self.conv1 = conv3x3(inplanes, planes, stride, conv2d=conv2d)  #skip-pooling
+
+        if stride > 1:
+            if pool_cfg._ptype == 'skip': # skip-pooling
+                s = stride
+                self.pooling = None
+            else:
+                s = 1
+                self.pooling = pooling(planes, pool_cfg) # other pooling
         else:
-            self.conv1 = conv3x3(inplanes, planes, 1, conv2d=conv2d)  #other pooling or no-pooling
+            s = 1 # no pooling
+            self.pooling = None
+
+        self.conv1 = conv3x3(inplanes, planes, s, conv2d=conv2d)
         self.bn1 = norm_layer(planes)
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes, conv2d=conv2d)
         self.bn2 = norm_layer(planes)
         self.downsample = downsample
         self.stride = stride
-        if stride > 1:
-            self.pooling = pooling(planes, pool_cfg)
-        else:
-            self.pooling = None
 
     def forward(self, x):
         identity = x
@@ -90,20 +95,25 @@ class Bottleneck(nn.Module):
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv1x1(inplanes, width, conv2d=conv2d)
         self.bn1 = norm_layer(width)
-        if stride > 1 and pool_cfg._ptype == 'skip':
-            self.conv2 = conv3x3(width, width, stride, groups, dilation, conv2d=conv2d)
+
+        if stride > 1:
+            if pool_cfg._ptype == 'skip': # skip-pooling
+                s = stride
+                self.pooling = None
+            else:
+                s = 1
+                self.pooling = pooling(planes * self.expansion, pool_cfg) # other pooling
         else:
-            self.conv2 = conv3x3(width, width, 1, groups, dilation, conv2d=conv2d)
+            s = 1 # no pooling
+            self.pooling = None
+
+        self.conv2 = conv3x3(width, width, s, groups, dilation, conv2d=conv2d)
         self.bn2 = norm_layer(width)
         self.conv3 = conv1x1(width, planes * self.expansion, conv2d=conv2d)
         self.bn3 = norm_layer(planes * self.expansion)
         self.relu = nn.ReLU(inplace=True)
         self.downsample = downsample
         self.stride = stride
-        if stride > 1:
-            self.pooling = pooling(planes * self.expansion, pool_cfg)
-        else:
-            self.pooling = None
 
     def forward(self, x):
         identity = x
