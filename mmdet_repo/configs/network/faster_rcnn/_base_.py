@@ -29,7 +29,7 @@ model = dict(
 	type='FasterRCNN',
 	backbone=dict(
 		type='MyBackBone',
-		name='resnet50',
+		name='resnet50-skip-1222',
 		pth_file=root+'/check_points/resnet50.pth',
 		use_fc_layer=False
 		),

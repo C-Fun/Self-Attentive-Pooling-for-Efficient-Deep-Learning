@@ -5,6 +5,6 @@ _base_ = [root + '/mmdet_repo/configs/network/faster_rcnn/dyresnet18/dyresnet18.
 
 model = dict(
 	backbone=dict(
-		name='dyresnet18_nlp_reduced',
+		name='dyresnet18-nlp_reduced-1222',
 		),
 	)

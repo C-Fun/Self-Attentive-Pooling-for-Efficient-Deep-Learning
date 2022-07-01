@@ -10,26 +10,29 @@ except:
     print('====================================================')
     num_classes = 80
 
-# runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=273)
-
-# load_from = root+'/mmdetection/work_dirs/yolov3/latest.pth'
-
 # The new config inherits a base config to highlight the necessary modification
 _base_ = [
-    root + '/mmdet_repo/configs/common/coco_detection.py',
-    root + '/mmdet_repo/configs/common/runtime.py',
+	root + '/mmdet_repo/configs/baseline/yolov3.py',
+	root + '/mmdet_repo/configs/common/coco_detection.py',
+	root + '/mmdet_repo/configs/common/runtime.py',
 ]
+
+
+# import my net
+custom_imports = dict(
+	imports=['mmdet_repo.mmdet_network'],
+	allow_failed_imports=False
+	)
 
 # model settings
 model = dict(
     type='YOLOV3',
     backbone=dict(
-        type='Darknet',
-        depth=53,
-        out_indices=(3, 4, 5),
-        init_cfg=dict(type='Pretrained', checkpoint='open-mmlab://darknet53')
-        ),
+		type='MyBackBone',
+		name='resnet50-skip-1222',
+		pth_file=root+'/check_points/resnet50.pth',
+		use_fc_layer=False
+		),
     neck=dict(
         type='YOLOV3Neck',
         num_scales=3,
@@ -79,3 +82,22 @@ model = dict(
         nms=dict(type='nms', iou_threshold=0.45),
         max_per_img=100))
 
+try:
+	data = dict(
+	    samples_per_gpu=2,
+	    workers_per_gpu=2,
+	    train=dict(
+	        classes = classes
+	        ),
+	    val=dict(
+	        classes = classes
+	        ),
+	    test=dict(
+	        classes = classes
+	        )
+	    )
+except:
+	data = dict(
+	    samples_per_gpu=2,
+	    workers_per_gpu=2,
+	    )
