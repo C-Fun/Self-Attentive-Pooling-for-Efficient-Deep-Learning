@@ -160,13 +160,16 @@ def name_parse(name):
 
 @BACKBONES.register_module()
 class MyBackBone(Network, BaseModule):
-	def __init__(self, name, pth_file=None, **kwargs):
+	def __init__(self, name, pth_file=None, out_indices=[1,2,3,4], **kwargs):
 		cfg = name_parse(name)
+		self.out_indices = out_indices
 		super(MyBackBone, self).__init__(cfg, pth_file=pth_file, **kwargs)
 
 	def forward(self, x):
 		outs = self.net(x)
-		# for i,out in enumerate(outs):
-		# 	print(i, out.shape)
+		final_outs = []
+		for i in self.out_indices:
+			final_outs.append(outs[i-1])
+		# 	print(i, outs[i-1].shape)
 		# print()
-		return outs
+		return final_outs
