@@ -97,27 +97,32 @@ class InvertedResidual(nn.Module):
 
 
 class MobileNetV2(nn.Module):
-    def __init__(self, cfg, num_classes=1000, width_mult=1.):
+    def __init__(self, cfg, num_classes=1000, width_mult=1., use_fc_layer=True, out_indices=None):
         super(MobileNetV2, self).__init__()
         # setting of inverted residual blocks
         self.arch_cfgs = [
             # # t, c, n, s
-            [1,  16, 1, 1],
-            [6,  24, 2, 2],
-            [6,  32, 3, 2],
+            [1,  16, 1, -1], # 1
+            [6,  24, 2, -1], # 2
+            [6,  32, 3, -1], # 2
             [6,  64, 4, -1], # 2
             [6,  96, 3, -1], # 1
             [6, 160, 3, -1], # 2
             [6, 320, 1, -1], # 1
         ]
+        self._use_fc_layer = use_fc_layer
+        self._out_indices = out_indices
 
         # building first layer
         input_channel = _make_divisible(32 * width_mult, 4 if width_mult == 0.1 else 8)
-        layers = [conv_3x3_bn(3, input_channel, 2, conv2d=cfg['conv1']._conv2d)]
+        self.conv1 = conv_3x3_bn(3, input_channel, 2, conv2d=cfg['conv1']._conv2d)
+
+        layers = []
         # building inverted residual blocks
         block = InvertedResidual
         for layer_i, (t, c, n, _) in enumerate(self.arch_cfgs):
             output_channel = _make_divisible(c * width_mult, 4 if width_mult == 0.1 else 8)
+            pool_blocks = []
 
             layer_cfg = cfg['layer'+str(layer_i+1)]
             pool_cfg = layer_cfg.pool_cfg
@@ -126,28 +131,43 @@ class MobileNetV2(nn.Module):
             if _stride==1 or _ptype=='skip':
                 s = _stride
             else:
-                layers.append(pooling(input_channel, pool_cfg))
+                pool_blocks.append(pooling(input_channel, pool_cfg))
                 s = 1
 
             for i in range(n):
-                layers.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv2d=layer_cfg._conv2d))
+                pool_blocks.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv2d=layer_cfg._conv2d))
                 input_channel = output_channel
+
+            layers.append(nn.Sequential(*pool_blocks))
         self.features = nn.Sequential(*layers)
+
         # building last several layers
         output_channel = _make_divisible(1280 * width_mult, 4 if width_mult == 0.1 else 8) if width_mult > 1.0 else 1280
-        self.conv = conv_1x1_bn(input_channel, output_channel, conv2d=cfg['conv2']._conv2d)
+        self.conv2 = conv_1x1_bn(input_channel, output_channel, conv2d=cfg['conv2']._conv2d)
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.classifier = nn.Linear(output_channel, num_classes)
 
         self._initialize_weights()
 
     def forward(self, x):
-        x = self.features(x)
-        x = self.conv(x)
-        x = self.avgpool(x)
-        x = x.view(x.size(0), -1)
-        x = self.classifier(x)
-        return x
+        out = self.conv1(x)
+
+        outs = []
+        for layer_i in self.features:
+            out = layer_i(out)
+            outs.append(out)
+
+        if self._use_fc_layer:
+            y = self.conv2(out)
+            y = self.avgpool(y)
+            y = y.view(y.size(0), -1)
+            y = self.classifier(y)
+            return y
+        else:
+            if self._out_indices == None:
+                return outs
+            else:
+                return outs[self._out_indices]
 
     def _initialize_weights(self):
         for m in self.modules():

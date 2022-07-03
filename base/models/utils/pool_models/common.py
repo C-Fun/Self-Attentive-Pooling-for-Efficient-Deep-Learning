@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from .lip import LIP_BASE
 from .nlp import NLP_BASE
-from .dfm_nlp import DFMNLP_BASE
+from .dfmnlp import DFMNLP_BASE
 from .dfmixp import DFMIXP_BASE
 from .mixp import MIXP_BASE
 from .gaussian_pool import GaussianPooling2d
@@ -33,7 +33,7 @@ def lip2d(inc, kernel_size, stride, padding, **kwargs):
 def nlp2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
 	return Pool2d(NLP_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)
 
-def dfm_nlp2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
+def dfmnlp2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
 	return Pool2d(DFMNLP_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)
 
 def dfmixp2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):

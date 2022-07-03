@@ -145,12 +145,13 @@ class ResNet_v2(nn.Module):
 
     def __init__(self, cfg, block, layers, num_classes=1000, zero_init_residual=False,
                  groups=1, width_per_group=64, replace_stride_with_dilation=None,
-                 norm_layer=None, use_fc_layer=True):
+                 norm_layer=None, use_fc_layer=True, out_indices=None):
         super(ResNet_v2, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
         self._use_fc_layer = use_fc_layer
+        self._out_indices = out_indices
 
         self.inplanes = 64
         self.dilation = 1
@@ -268,6 +269,7 @@ class ResNet_v2(nn.Module):
         x2 = self.layer2(x1)
         x3 = self.layer3(x2)
         x4 = self.layer4(x3)
+        outs = (x1, x2, x3, x4)
 
         if self._use_fc_layer:
             y = self.avgpool(x4)
@@ -275,7 +277,10 @@ class ResNet_v2(nn.Module):
             y = self.fc(y)
             return y
         else:
-            return (x1, x2, x3, x4)
+            if self._out_indices == None:
+                return outs
+            else:
+                return outs[self._out_indices]
 
 
 def _resnet(arch, cfg, block, layers, pth_file, **kwargs):

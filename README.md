@@ -31,6 +31,8 @@ home root
 
 ​	*(resnet18, resnet18_v2, resnet50, resnet50_v2, mobilenet, mobilenet_v2)*
 
+- you can also use dy+backbone to use dynamic convolution (e.g., dyresnet18)
+
 ###### optional pooling methods:
 
 ​	*(skip, maxp, avgp, lip, gaussian_pool, nlp, dfmnlp, mixp, dfmixp)*

@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from einops import rearrange, reduce, repeat
 
 from ..deform_convs.dcnv2 import DeformConv2d, reshape_x_offset
-from .dfm_nlp import DFMNLP_BASE
+from .dfmnlp import DFMNLP_BASE
 from .position_encoding import NestedTensor
 
 class MIXP_BASE(DFMNLP_BASE):

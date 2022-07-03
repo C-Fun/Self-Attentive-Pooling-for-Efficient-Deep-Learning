@@ -98,6 +98,7 @@ def name_parse(name):
         raise Exception("Undefined Pooling Type!")
 
     if _arch in resnet_tpls:
+        assert len(strides)==4
         cfg = {
             'arch': _arch,
             'conv1': None,
@@ -121,6 +122,7 @@ def name_parse(name):
         cfg['layer4'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[3]}
 
     elif _arch in mobilenet_tpls:
+        assert len(strides)==7
         cfg = {
             'arch': _arch,
             'conv1': None,
@@ -128,6 +130,9 @@ def name_parse(name):
             'layer2': None,
             'layer3': None,
             'layer4': None,
+            'layer5': None,
+            'layer6': None,
+            'layer7': None,
             'conv2': None,
         }
 
@@ -137,6 +142,9 @@ def name_parse(name):
         cfg['layer2'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[1]}
         cfg['layer3'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[2]}
         cfg['layer4'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[3]}
+        cfg['layer5'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[4]}
+        cfg['layer6'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[5]}
+        cfg['layer7'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[6]}
         cfg['conv2'] = {'_conv2d':_ctype, 'pool_cfg': {}}
 
     else:
@@ -162,8 +170,8 @@ def pool2d(_ptype):
         return gaussian_pool2d
     elif _ptype=='nlp':
         return nlp2d
-    elif _ptype=='dfm_nlp':
-        return dfm_nlp2d
+    elif _ptype=='dfmnlp':
+        return dfmnlp2d
     elif _ptype=='dfmixp':
         return dfmixp2d
     elif _ptype=='mixp':
