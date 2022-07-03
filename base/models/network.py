@@ -77,19 +77,31 @@ def name_parse(name):
             pdicts.append(pool_dict('skip', s) if s==1 else pool_dict(_ptype, s))
         pdicts = tuple(pdicts)
     elif _ptype in my_pool_tpls:
-        s1, s2, s3, s4 = strides
-        pdicts = (
-            pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=1, rt=1, nh=4, ct=_ctype, wn=True),
-            pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=1, rt=1, nh=8, ct=_ctype, wn=True),
-            pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=1, rt=1, nh=16, ct=_ctype, wn=True),
-            pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=1, rt=1, nh=32, ct=_ctype, wn=True),
-        )
-        if 'reduced' in pool_str:
+        if len(strides)==4:
+            s1, s2, s3, s4 = strides
             pdicts = (
-                pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=16, rt=1/4, nh=4, ct=_ctype, wn=True),
-                pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=8, rt=1/4, nh=8, ct=_ctype, wn=True),
-                pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=4, rt=1/4, nh=16, ct=_ctype, wn=True),
-                pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=2, rt=1/4, nh=32, ct=_ctype, wn=True),
+                pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=1, rt=1, nh=4, ct=_ctype, wn=True),
+                pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=1, rt=1, nh=8, ct=_ctype, wn=True),
+                pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=1, rt=1, nh=16, ct=_ctype, wn=True),
+                pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=1, rt=1, nh=32, ct=_ctype, wn=True),
+            )
+            if 'reduced' in pool_str:
+                pdicts = (
+                    pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=16, rt=1/4, nh=4, ct=_ctype, wn=True),
+                    pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=8, rt=1/4, nh=8, ct=_ctype, wn=True),
+                    pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=4, rt=1/4, nh=16, ct=_ctype, wn=True),
+                    pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=2, rt=1/4, nh=32, ct=_ctype, wn=True),
+                )
+        elif len(strides)==7:
+            s1, s2, s3, s4, s5, s6, s7 = strides
+            pdicts = (
+                pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=1, rt=1, nh=2, ct=_ctype, wn=True),
+                pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=1, rt=1, nh=4, ct=_ctype, wn=True),
+                pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=1, rt=1, nh=8, ct=_ctype, wn=True),
+                pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=1, rt=1, nh=16, ct=_ctype, wn=True),
+                pool_dict('skip', s5) if s5==1 else pool_dict(_ptype, s5, ps=1, rt=1, nh=32, ct=_ctype, wn=True),
+                pool_dict('skip', s6) if s6==1 else pool_dict(_ptype, s6, ps=1, rt=1, nh=64, ct=_ctype, wn=True),
+                pool_dict('skip', s7) if s7==1 else pool_dict(_ptype, s7, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
             )
         if 'headfix2' in pool_str:
             for _pd in pdicts:
