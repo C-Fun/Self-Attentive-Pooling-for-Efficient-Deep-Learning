@@ -5,13 +5,29 @@
 ## STL10
 
 - need to specify variable 'root' in ann.py
-- create a 'data' folder at the 'root' direction
+
+```shell
+[base/ann.py]
+...
+root = '/nas/home/fangc/' # specify your home root
+```
+
+- create a 'data' folder at the home root
+
+```shell
+home root
+|- data
+|- |- cifar100
+|- |- stl10
+|- |- coco
+|- Non-Local-Pooling
+```
 
 #### Architecture is specified by keywords: 
 
 ​	***[prepool-pooling-stride]-backbone-pooling-strides***
 
-###### optional pooling methods: 
+###### optional backbones: 
 
 ​	*(resnet18, resnet18_v2, resnet50, resnet50_v2, mobilenet, mobilenet_v2)*
 
@@ -19,7 +35,7 @@
 
 ​	*(skip, maxp, avgp, lip, gaussian_pool, nlp, dfmnlp, mixp, dfmixp)*
 
-- For (nlp, dfmnlp, mixp, dfmixp), you can add _headfix2 or _reduced like ' nlp_headfix2_reduced'
+- for (nlp, dfmnlp, mixp, dfmixp), you can add _headfix2 or _reduced 
 
 Architecture example: prepool-nlp_headfix2-4-resnet18-nlp_headfix2-1222
 
