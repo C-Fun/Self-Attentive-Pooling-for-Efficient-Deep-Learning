@@ -4,6 +4,27 @@
 
 ## STL10
 
+- need to specify variable 'root' in ann.py
+- create a 'data' folder at the 'root' direction
+
+#### Architecture is specified by keywords: 
+
+​	***[prepool-pooling-stride]-backbone-pooling-strides***
+
+###### optional pooling methods: 
+
+​	*(resnet18, resnet18_v2, resnet50, resnet50_v2, mobilenet, mobilenet_v2)*
+
+###### optional pooling methods:
+
+​	*(skip, maxp, avgp, lip, gaussian_pool, nlp, dfmnlp, mixp, dfmixp)*
+
+- For (nlp, dfmnlp, mixp, dfmixp), you can add _headfix2 or _reduced like ' nlp_headfix2_reduced'
+
+Architecture example: prepool-nlp_headfix2-4-resnet18-nlp_headfix2-1222
+
+###### Examples:
+
 ```shell
 [Non-Local-Pooling/]
 > cd base
@@ -19,7 +40,7 @@
 
 ## MMDetection
 
-Firstly, you need to set your mmdetection library path:
+- Firstly, you need to set your mmdetection library path:
 
 ```shell
 [mmdet_train.sh]
@@ -35,7 +56,14 @@ MMDET_ROOT='/nas/home/fangc/mmdetection/' # set your mmdetection library path he
 ...
 ```
 
+- Specify your coco data root:
 
+```shell
+[mmdet_repo/configs/common/coco_detection.py]
+root = '/nas/home/fangc/' # specify your home root
+...
+data_root = root + '/data/coco/'
+```
 
 Then, run the shell file as follows:
 

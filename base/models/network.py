@@ -15,7 +15,7 @@ def name_parse(name):
     cfg = None
     resnet_tpls = ('resnet18', 'resnet18_v2', 'resnet50', 'resnet50_v2')
     mobilenet_tpls = ('mobilenet', 'mobilenet_v2')
-    sota_pool_tpls = ('skip', 'maxp', 'lip', 'gaussian_pool')
+    sota_pool_tpls = ('skip', 'maxp', 'avgp', 'lip', 'gaussian_pool')
     my_pool_tpls = ('nlp', 'dfmnlp', 'mixp', 'dfmixp')
 
     name_list = name.split('-')
