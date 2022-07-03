@@ -31,13 +31,13 @@ home root
 
 ​	*(resnet18, resnet18_v2, resnet50, resnet50_v2, mobilenet, mobilenet_v2)*
 
-- you can also use dy+backbone to use dynamic convolution (e.g., dyresnet18)
+- for resnet you can also use dy+backbone to use dynamic convolution (e.g., dyresnet18, dymobilenet)
 
 ###### optional pooling methods:
 
 ​	*(skip, maxp, avgp, lip, gaussian_pool, nlp, dfmnlp, mixp, dfmixp)*
 
-- for (nlp, dfmnlp, mixp, dfmixp), you can add _headfix2 or _reduced 
+- for (nlp, dfmnlp, mixp, dfmixp), you can use pooling_headfix2 or pooling_reduced (e.g., nlp_headfix2, nlp_reduced)
 
 Architecture example: prepool-nlp_headfix2-4-resnet18-nlp_headfix2-1222
 
