@@ -39,7 +39,10 @@ home root
 
 - for (nlp, dfmnlp, mixp, dfmixp), you can use pooling_headfix2 or pooling_reduced (e.g., nlp_headfix2, nlp_reduced)
 
-Architecture example: prepool-nlp_headfix2-4-resnet18-nlp_headfix2-1222
+Architecture example: 
+
+- prepool-nlp_headfix2-4-resnet18-nlp_headfix2-1222
+- mobilenet_v2-gaussian_pool-4222121
 
 ###### Examples:
 
@@ -51,9 +54,9 @@ Architecture example: prepool-nlp_headfix2-4-resnet18-nlp_headfix2-1222
 
 > python ann.py --dataset STL10 --batch_size 8 --architecture PREPOOL-NLP_HEADFIX2-4-RESNET18-SKIP-1222 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
 
-> python ann.py --dataset STL10 --batch_size 8 --architecture MOBILENET-SKIP-2121 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+> python ann.py --dataset STL10 --batch_size 8 --architecture MOBILENET-SKIP-1222121 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
 
-> python ann.py --dataset STL10 --batch_size 8 --architecture MOBILENET_v2-GAUSSIAN_POOL-2121 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+> python ann.py --dataset STL10 --batch_size 8 --architecture MOBILENET_v2-GAUSSIAN_POOL-1222121 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
 ```
 
 ## MMDetection
