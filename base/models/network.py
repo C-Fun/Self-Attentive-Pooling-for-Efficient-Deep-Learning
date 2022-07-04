@@ -116,6 +116,9 @@ def name_parse(name):
         if 'headfix2' in pool_str:
             for _pd in pdicts:
                 _pd['_num_heads'] = 2
+        if 'nowin' in pool_str:
+            for _pd in pdicts:
+                _pd['_win_norm'] = False
     else:
         raise Exception("Undefined Pooling Type!")
 
