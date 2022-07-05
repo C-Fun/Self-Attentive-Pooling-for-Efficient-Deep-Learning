@@ -206,8 +206,14 @@ class MobileNetV2(nn.Module):
                 m.weight.data.normal_(0, 0.01)
                 m.bias.data.zero_()
 
-def mobilenetv2(**kwargs):
+def mobilenetv2(cfg, pth_file=None, **kwargs):
     """
     Constructs a MobileNet V2 model
     """
-    return MobileNetV2(**kwargs)
+    model = MobileNetV2(cfg, **kwargs)
+    if pth_file!=None:
+        print('============== model keys ==========================')
+        print(model.state_dict().keys())
+        raise Exception("MobileNet doesn't support load pretrained model!")
+
+    return model

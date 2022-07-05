@@ -5,8 +5,8 @@ import torch.nn as nn
 
 from .backbones.resnet_v2 import resnet18_v2, resnet50_v2
 from .backbones.resnet import resnet18, resnet50
-from .backbones.mobilenet import MobileNetV2 as mobilenetv2
-from .backbones.mobilenet_v2 import MobileNetV2 as mobilenetv2_v2
+from .backbones.mobilenet import mobilenetv2 as mobilenetv2
+from .backbones.mobilenet_v2 import mobilenetv2 as mobilenetv2_v2
 
 from .utils.pool_models.common import *
 from .utils.dynamic_convs.dynamic_conv import Dynamic_conv2d
@@ -268,9 +268,9 @@ class Network(nn.Module):
         elif arch == 'resnet50_v2':
             self.net = resnet50_v2(cfg, pth_file=pth_file, **kwargs)
         elif arch == 'mobilenet':
-            self.net = mobilenetv2(cfg, **kwargs)
+            self.net = mobilenetv2(cfg, pth_file=pth_file, **kwargs)
         elif arch == 'mobilenet_v2':
-            self.net = mobilenetv2_v2(cfg, **kwargs)
+            self.net = mobilenetv2_v2(cfg, pth_file=pth_file, **kwargs)
         else:
             raise Exception("Undefined Backbone Type!")
 

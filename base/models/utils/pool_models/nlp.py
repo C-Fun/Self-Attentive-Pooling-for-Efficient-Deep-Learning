@@ -26,8 +26,10 @@ class NLP_BASE(nn.Module):
 						  nn.BatchNorm2d(embed_dim),
 						  nn.ReLU(inplace=True)
 						)
-
-		self.multihead_attn = MultiheadAttention(embed_dim=embed_dim, num_heads=num_heads, batch_first=True)
+		try:
+			self.multihead_attn = MultiheadAttention(embed_dim=embed_dim, num_heads=num_heads, batch_first=True)
+		except:
+			self.multihead_attn = MultiheadAttention(embed_dim=embed_dim, num_heads=num_heads)
 		
 		self.restore = nn.Sequential(
 					conv2d(embed_dim, in_channels, kernel_size=1, stride=1, padding=0),

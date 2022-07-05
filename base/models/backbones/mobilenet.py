@@ -6,21 +6,25 @@ arXiv preprint arXiv:1801.04381.
 import from https://github.com/tonylins/pytorch-mobilenet-v2
 """
 
+import torch
 import torch.nn as nn
 import math
+import numpy as np
 
 __all__ = ['mobilenetv2']
 
+
 def pooling(inc, pool_cfg):
     return pool_cfg._pool2d(inc=inc, \
-							kernel_size=pool_cfg._ksize, \
-							stride=pool_cfg._stride, \
-							padding=pool_cfg._padding, \
-							patch_size=pool_cfg._psize, \
-							dim_reduced_ratio=pool_cfg._dim_reduced_ratio, \
-							num_heads=pool_cfg._num_heads, \
-							conv2d=pool_cfg._conv2d, \
-							win_norm=pool_cfg._win_norm)
+                            kernel_size=pool_cfg._ksize, \
+                            stride=pool_cfg._stride, \
+                            padding=pool_cfg._padding, \
+                            patch_size=pool_cfg._psize, \
+                            dim_reduced_ratio=pool_cfg._dim_reduced_ratio, \
+                            num_heads=pool_cfg._num_heads, \
+                            conv2d=pool_cfg._conv2d, \
+                            win_norm=pool_cfg._win_norm)
+
 
 def _make_divisible(v, divisor, min_value=None):
     """
@@ -41,12 +45,14 @@ def _make_divisible(v, divisor, min_value=None):
         new_v += divisor
     return new_v
 
+
 def conv_3x3_bn(inp, oup, stride, conv2d=nn.Conv2d):
     return nn.Sequential(
         conv2d(inp, oup, 3, stride, 1, bias=False),
         nn.BatchNorm2d(oup),
         nn.ReLU6(inplace=True)
     )
+
 
 def conv_1x1_bn(inp, oup, conv2d=nn.Conv2d):
     return nn.Sequential(
@@ -102,13 +108,13 @@ class MobileNetV2(nn.Module):
         # setting of inverted residual blocks
         self.arch_cfgs = [
             # # t, c, n, s
-            [1,  16, 1, -1], # 1
-            [6,  24, 2, -1], # 2
-            [6,  32, 3, -1], # 2
-            [6,  64, 4, -1], # 2
-            [6,  96, 3, -1], # 1
-            [6, 160, 3, -1], # 2
-            [6, 320, 1, -1], # 1
+            [1, 16, 1, -1],  # 1
+            [6, 24, 2, -1],  # 2
+            [6, 32, 3, -1],  # 2
+            [6, 64, 4, -1],  # 2
+            [6, 96, 3, -1],  # 1
+            [6, 160, 3, -1],  # 2
+            [6, 320, 1, -1],  # 1
         ]
         self._use_fc_layer = use_fc_layer
         self._out_indices = out_indices
@@ -118,7 +124,7 @@ class MobileNetV2(nn.Module):
 
         # self.conv1 = conv_3x3_bn(3, input_channel, 2, conv2d=cfg['conv1']._conv2d)
         _conv1 = cfg['conv1']
-        if _conv1.pool_cfg._ptype=='skip':
+        if _conv1.pool_cfg._ptype == 'skip':
             self.conv1 = conv_3x3_bn(3, input_channel, _conv1.pool_cfg._stride, conv2d=cfg['conv1']._conv2d)
             self.conv1_pool = None
         else:
@@ -130,23 +136,24 @@ class MobileNetV2(nn.Module):
         block = InvertedResidual
         for layer_i, (t, c, n, _) in enumerate(self.arch_cfgs):
             output_channel = _make_divisible(c * width_mult, 4 if width_mult == 0.1 else 8)
-            pool_blocks = []
 
-            layer_cfg = cfg['layer'+str(layer_i+1)]
+            layer_cfg = cfg['layer' + str(layer_i + 1)]
             pool_cfg = layer_cfg.pool_cfg
             _ptype = pool_cfg._ptype
             _stride = pool_cfg._stride
-            if _stride==1 or _ptype=='skip':
-                s = _stride
+            if _stride == 1 or _ptype == 'skip':
+                pool_block = block(input_channel, output_channel, _stride, t, conv2d=layer_cfg._conv2d)
             else:
-                pool_blocks.append(pooling(input_channel, pool_cfg))
-                s = 1
+                pool_block = nn.ModuleList([
+                    pooling(input_channel, pool_cfg),
+                    block(input_channel, output_channel, 1, t, conv2d=layer_cfg._conv2d),
+                ])
+            layers.append(pool_block)
 
-            for i in range(n):
-                pool_blocks.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv2d=layer_cfg._conv2d))
+            for i in range(1, n):
                 input_channel = output_channel
+                layers.append(block(input_channel, output_channel, 1, t, conv2d=layer_cfg._conv2d))
 
-            layers.append(nn.Sequential(*pool_blocks))
         self.features = nn.Sequential(*layers)
 
         # building last several layers
@@ -193,8 +200,54 @@ class MobileNetV2(nn.Module):
                 m.weight.data.normal_(0, 0.01)
                 m.bias.data.zero_()
 
-def mobilenetv2(**kwargs):
+
+def mobilenetv2(cfg, pth_file=None, **kwargs):
     """
     Constructs a MobileNet V2 model
     """
-    return MobileNetV2(**kwargs)
+    model = MobileNetV2(cfg, **kwargs)
+    if pth_file!=None:
+        print('============== model keys ==========================')
+        print(model.state_dict().keys())
+        raise Exception("MobileNet doesn't support load pretrained model!")
+    # print(pth_file)
+    # if pth_file != None:
+    #     pretrained_net = torch.load(pth_file)
+    #     model_dict = model.state_dict()
+    #
+    #     print('============== pretrained_net =================')
+    #     print(pretrained_net.keys())
+    #     keyfixed_net = {}
+    #     for key in pretrained_net.keys():
+    #         name_list = key.split('.')
+    #         if name_list[0] == 'features':
+    #             if name_list[1] == '0':
+    #                 name_list[0] = 'conv1'
+    #             elif name_list[1] == '18':
+    #                 name_list[0] = 'conv2'
+    #             else:
+    #                 name_list[1] = str(int(name_list[1]) - 1)
+    #         print('.'.join(name_list))
+    #
+    #
+    #     print('============== model ==========================')
+    #     print(model_dict.keys())
+    #
+    #     common_keys = [k for k in pretrained_net.keys() if k in model_dict.keys()]
+    #     state_dict = {}
+    #     for k in common_keys:
+    #         if 'fc' in k:
+    #             continue
+    #         pv = pretrained_net[k]
+    #         mv = model_dict[k]
+    #         if mv.shape != pv.shape:
+    #             print('Mismatched Shape: {:s}!'.format(k), pv.shape, '=>', mv.shape)
+    #             state_dict[k] = pv.expand(mv.shape)
+    #         else:
+    #             print('Matched Shape: {:s}!'.format(k))
+    #             state_dict[k] = pv
+    #
+    #     model_dict.update(state_dict)
+    #     model.load_state_dict(model_dict)
+    # print(model)
+    return MobileNetV2(cfg, **kwargs)
