@@ -153,13 +153,17 @@ class MobileNetV2(nn.Module):
         for layer_i, (t, c, n, _) in enumerate(self.arch_cfgs):
             output_channel = _make_divisible(c * width_mult, 4 if width_mult == 0.1 else 8)
 
+            pool_blocks = []
+
             layer_cfg = cfg['layer' + str(layer_i + 1)]
             pool_cfg = layer_cfg.pool_cfg
             s = pool_cfg._stride
 
             for i in range(n):
-                layers.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv2d=layer_cfg._conv2d, pool_cfg=pool_cfg))
+                pool_blocks.append(block(input_channel, output_channel, s if i == 0 else 1, t, conv2d=layer_cfg._conv2d, pool_cfg=pool_cfg))
                 input_channel = output_channel
+
+            layers.append(nn.Sequential(*pool_blocks))
         self.features = nn.Sequential(*layers)
 
         # building last several layers
@@ -180,8 +184,9 @@ class MobileNetV2(nn.Module):
             out = layer_i(out)
             outs.append(out)
 
+        y = self.conv2(out)
+        outs.append(y)
         if self._use_fc_layer:
-            y = self.conv2(out)
             y = self.avgpool(y)
             y = y.view(y.size(0), -1)
             y = self.classifier(y)

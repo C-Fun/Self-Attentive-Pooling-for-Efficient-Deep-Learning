@@ -9,7 +9,7 @@ model = dict(
         ),
     box_head=dict(
         anchor_generator=dict(
-            strides=[64, 32, 16, 8]),
-        featmap_strides=[64, 32, 16, 8],
+            strides=[64, 32, 16]),
+        featmap_strides=[64, 32, 16],
         ),
     )

@@ -8,3 +8,8 @@ model = dict(
         name='resnet18-dfmnlp_headfix2_nowin_reduced-1222',
         ),
     )
+
+data = dict(
+    samples_per_gpu=1,
+    workers_per_gpu=1,
+)
