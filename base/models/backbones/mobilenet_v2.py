@@ -137,7 +137,15 @@ class MobileNetV2(nn.Module):
 
         # building first layer
         input_channel = _make_divisible(32 * width_mult, 4 if width_mult == 0.1 else 8)
-        self.conv1 = conv_3x3_bn(3, input_channel, 2, conv2d=cfg['conv1']._conv2d)
+
+        # self.conv1 = conv_3x3_bn(3, input_channel, 2, conv2d=cfg['conv1']._conv2d)
+        _conv1 = cfg['conv1']
+        if _conv1.pool_cfg._ptype=='skip':
+            self.conv1 = conv_3x3_bn(3, input_channel, _conv1.pool_cfg._stride, conv2d=cfg['conv1']._conv2d)
+            self.conv1_pool = None
+        else:
+            self.conv1 = conv_3x3_bn(3, input_channel, 1, conv2d=cfg['conv1']._conv2d)
+            self.conv1_pool = pooling(input_channel, _conv1.pool_cfg)
 
         layers = []
         # building inverted residual blocks
@@ -164,6 +172,8 @@ class MobileNetV2(nn.Module):
 
     def forward(self, x):
         out = self.conv1(x)
+        if self.conv1_pool is not None:
+            out = self.conv1_pool(out)
 
         outs = []
         for layer_i in self.features:

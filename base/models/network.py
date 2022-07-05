@@ -61,7 +61,7 @@ def name_parse(name):
             _pre_ptype = prepool_str
             pre_pdict = pool_dict(_pre_ptype, _pre_pstride)
         elif _pre_ptype in my_pool_tpls:
-            pre_pdict = pool_dict(_pre_ptype, _pre_pstride, ps=2, rt=1, nh=8, ct=_ctype, wn=True)
+            pre_pdict = pool_dict(_pre_ptype, _pre_pstride, ps=1, rt=1, nh=8, ct=_ctype, wn=True)
             if 'reduced' in prepool_str:
                 pre_pdict = pool_dict(_pre_ptype, _pre_pstride, ps=_pre_pstride, rt=1/4, nh=8, ct=_ctype, wn=True)
             if 'headfix2' in prepool_str:
@@ -161,8 +161,11 @@ def name_parse(name):
             'conv2': None,
         }
 
-        assert prepool==False
-        cfg['conv1'] = {'_conv2d':_ctype, 'pool_cfg': {}}
+        if prepool:
+            cfg['conv1'] = {'_conv2d':_ctype, 'pool_cfg': pre_pdict}
+        else:
+            cfg['conv1'] = {'_conv2d':_ctype, 'pool_cfg': pool_dict('skip', 2)}
+
         cfg['layer1'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[0]}
         cfg['layer2'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[1]}
         cfg['layer3'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[2]}
