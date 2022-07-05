@@ -37,7 +37,7 @@ home root
 
 ​	*(skip, maxp, avgp, lip, gaussian_pool, nlp, dfmnlp, mixp, dfmixp)*
 
-- for (nlp, dfmnlp, mixp, dfmixp), you can use pooling_headfix2 or pooling_reduced (e.g., nlp_headfix2, nlp_reduced)
+- for (nlp, dfmnlp, mixp, dfmixp), you can use pooling_headfix2, pooling_nowin or pooling_reduced (e.g., nlp_headfix2_nowin (recommended), nlp_reduced)
 
 Architecture example: 
 
