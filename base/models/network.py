@@ -61,7 +61,7 @@ def name_parse(name):
             _pre_ptype = prepool_str
             pre_pdict = pool_dict(_pre_ptype, _pre_pstride)
         elif _pre_ptype in my_pool_tpls:
-            pre_pdict = pool_dict(_pre_ptype, _pre_pstride, ps=1, rt=1, nh=8, ct=_ctype, wn=True)
+            pre_pdict = pool_dict(_pre_ptype, _pre_pstride, ps=2, rt=1, nh=8, ct=_ctype, wn=True)
             if 'reduced' in prepool_str:
                 pre_pdict = pool_dict(_pre_ptype, _pre_pstride, ps=_pre_pstride, rt=1/4, nh=8, ct=_ctype, wn=True)
             if 'headfix2' in prepool_str:
