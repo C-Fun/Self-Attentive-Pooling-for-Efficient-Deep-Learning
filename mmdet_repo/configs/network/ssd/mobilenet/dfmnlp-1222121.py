@@ -10,6 +10,6 @@ model = dict(
     )
 
 data = dict(
-    samples_per_gpu=1,
-    workers_per_gpu=1,
+    samples_per_gpu=16,
+    workers_per_gpu=4,
 )

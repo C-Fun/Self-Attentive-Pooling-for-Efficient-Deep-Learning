@@ -7,7 +7,7 @@ model = dict(
     backbone=dict(
         name='mobilenet-skip-4222121',
         ),
-    box_head=dict(
+    bbox_head=dict(
         anchor_generator=dict(
             strides=[k*4 for k in [16, 32, 64, 107, 160, 320]]),
         ),

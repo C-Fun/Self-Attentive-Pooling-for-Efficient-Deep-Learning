@@ -7,7 +7,7 @@ model = dict(
     backbone=dict(
         name='mobilenet-skip-2222121',
         ),
-    box_head=dict(
+    bbox_head=dict(
         anchor_generator=dict(
             strides=[64, 32, 16]),
         featmap_strides=[64, 32, 16],
