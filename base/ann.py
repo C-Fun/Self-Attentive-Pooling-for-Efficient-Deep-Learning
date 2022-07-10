@@ -532,6 +532,11 @@ if __name__ == '__main__':
 
 	model = Network(model_cfg, num_classes=labels, pth_file=pth_file)
 
+	total_params = sum(p.numel() for p in model.parameters())
+	print(f'{total_params:,} total parameters.')
+	total_trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+	print(f'{total_trainable_params:,} training parameters.')
+
 	device_ids = [id for id in range(len(args.devices.split(',')))]
 	model = nn.DataParallel(model, device_ids=device_ids)
 
