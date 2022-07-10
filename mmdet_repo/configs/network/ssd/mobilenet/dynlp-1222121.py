@@ -5,7 +5,7 @@ _base_ = [root + '/mmdet_repo/configs/network/ssd/mobilenet/skip-1222121.py']
 
 model = dict(
     backbone=dict(
-        name='mobilenet_v2-dfmnlp_headfix2_nowin_reduced-1222121',
+        name='dymobilenet_v2-nlp_headfix2_nowin_reduced-1222121',
         ),
     )
 
