@@ -11,7 +11,7 @@ except:
     num_classes = 80
 
 # runtime settings
-runner = dict(type='EpochBasedRunner', max_epochs=273)
+runner = dict(type='EpochBasedRunner', max_epochs=10)
 
 # The new config inherits a base config to highlight the necessary modification
 _base_ = [

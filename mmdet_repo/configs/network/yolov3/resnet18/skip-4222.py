@@ -7,7 +7,7 @@ model = dict(
     backbone=dict(
         name='resnet18-skip-4222',
         ),
-    box_head=dict(
+    bbox_head=dict(
         anchor_generator=dict(
             strides=[128, 64, 32]),
         featmap_strides=[128, 64, 32],

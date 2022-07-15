@@ -9,6 +9,12 @@ from .dfmixp import DFMIXP_BASE
 from .mixp import MIXP_BASE
 from .gaussian_pool import GaussianPooling2d
 
+from .nlp_noexp import NLP_BASE as NOEXP_BASE
+from .nlp_nosigmoid import NLP_BASE as NOSIGMOID_BASE
+from .nlp_nope import NLP_BASE as NOPE_BASE
+from .nlp_nobn1 import NLP_BASE as NOBN1_BASE
+from .nlp_nobn2 import NLP_BASE as NOBN2_BASE
+
 class Pool2d(nn.Module):
 	def __init__(self, pool_module, in_channels, kernel_size=2, stride=2, padding=0, win_norm=True, **kwargs):
 		super(Pool2d, self).__init__()
@@ -55,3 +61,20 @@ def avg_pool2d(kernel_size, stride, padding, **kwargs):
 
 def gaussian_pool2d(inc, kernel_size, stride, padding, **kwargs):
 	return GaussianPooling2d(inc, kernel_size, stride, padding, stochasticity='HWCN')
+
+
+# Ablation Study
+def nlp_noexp2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
+	return Pool2d(NOEXP_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)
+
+def nlp_nosigmoid2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
+	return Pool2d(NOSIGMOID_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)
+
+def nlp_nope2d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
+	return Pool2d(NOPE_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)
+
+def nlp_nobn12d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
+	return Pool2d(NOBN1_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)
+
+def nlp_nobn22d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
+	return Pool2d(NOBN2_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)

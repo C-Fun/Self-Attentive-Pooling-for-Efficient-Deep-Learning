@@ -16,7 +16,7 @@ def name_parse(name):
     resnet_tpls = ('resnet18', 'resnet18_v2', 'resnet50', 'resnet50_v2')
     mobilenet_tpls = ('mobilenet', 'mobilenet_v2')
     sota_pool_tpls = ('skip', 'maxp', 'avgp', 'lip', 'gaussian_pool')
-    my_pool_tpls = ('nlp', 'dfmnlp', 'mixp', 'dfmixp')
+    my_pool_tpls = ('nlp', 'dfmnlp', 'mixp', 'dfmixp', 'nlpnoexp', 'nlpnosigmoid', 'nlpnope', 'nlpnobn1', 'nlpnobn2')
 
     name_list = name.split('-')
     print("Name Type: '[prepool-pooling-stride](optional)'-'netarch-pooling-strides'")
@@ -86,11 +86,32 @@ def name_parse(name):
                 pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=1, rt=1, nh=32, ct=_ctype, wn=True),
             )
             if 'reduced' in pool_str:
+                # pdicts = (
+                #     pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=16, rt=1/4, nh=4, ct=_ctype, wn=True),
+                #     pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=8, rt=1/4, nh=8, ct=_ctype, wn=True),
+                #     pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=4, rt=1/4, nh=16, ct=_ctype, wn=True),
+                #     pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=2, rt=1/4, nh=32, ct=_ctype, wn=True),
+                # )
                 pdicts = (
-                    pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=16, rt=1/4, nh=4, ct=_ctype, wn=True),
-                    pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=8, rt=1/4, nh=8, ct=_ctype, wn=True),
-                    pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=4, rt=1/4, nh=16, ct=_ctype, wn=True),
-                    pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=2, rt=1/4, nh=32, ct=_ctype, wn=True),
+                    pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=4, rt=1, nh=4, ct=_ctype, wn=True),
+                    pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=2, rt=1, nh=8, ct=_ctype, wn=True),
+                    pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=1, rt=1, nh=16, ct=_ctype, wn=True),
+                    pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=1, rt=1, nh=32, ct=_ctype, wn=True),
+                )
+
+            if 'reduced0211' in pool_str:
+                pdicts = (
+                    pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=0, rt=1, nh=4, ct=_ctype, wn=True),
+                    pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=2, rt=1, nh=8, ct=_ctype, wn=True),
+                    pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=1, rt=1, nh=16, ct=_ctype, wn=True),
+                    pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=1, rt=1, nh=32, ct=_ctype, wn=True),
+                )
+            if 'reduced0842' in pool_str:
+                pdicts = (
+                    pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=0, rt=1, nh=4, ct=_ctype, wn=True),
+                    pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=8, rt=1, nh=8, ct=_ctype, wn=True),
+                    pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=4, rt=1, nh=16, ct=_ctype, wn=True),
+                    pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=2, rt=1, nh=32, ct=_ctype, wn=True),
                 )
         elif len(strides)==7:
             s1, s2, s3, s4, s5, s6, s7 = strides
@@ -204,6 +225,16 @@ def pool2d(_ptype):
         return dfmixp2d
     elif _ptype=='mixp':
         return mixp2d
+    elif _ptype=='nlpnoexp':
+        return nlp_noexp2d
+    elif _ptype=='nlpnosigmoid':
+        return nlp_nosigmoid2d
+    elif _ptype=='nlpnope':
+        return nlp_nope2d
+    elif _ptype=='nlpnobn1':
+        return nlp_nobn12d
+    elif _ptype=='nlpnobn2':
+        return nlp_nobn22d
     else:
         raise Exception("Undefined Pooling Type!")
 
