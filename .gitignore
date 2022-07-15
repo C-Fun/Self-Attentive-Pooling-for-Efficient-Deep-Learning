@@ -10,4 +10,5 @@
 
 /base/logs_new/
 /base/trained_models_ann/
+/base/visualization/
 /base/models/configs/
