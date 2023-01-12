@@ -1,4 +1,4 @@
-# Non-Local-Pooling
+# Self-Attentive Pooling for Efficient Deep Learning
 
 
 

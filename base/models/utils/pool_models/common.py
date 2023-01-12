@@ -15,6 +15,8 @@ from .nlp_nope import NLP_BASE as NOPE_BASE
 from .nlp_nobn1 import NLP_BASE as NOBN1_BASE
 from .nlp_nobn2 import NLP_BASE as NOBN2_BASE
 
+from .attn_pool import ATTNPOOL_BASE
+
 class Pool2d(nn.Module):
 	def __init__(self, pool_module, in_channels, kernel_size=2, stride=2, padding=0, win_norm=True, **kwargs):
 		super(Pool2d, self).__init__()
@@ -78,3 +80,7 @@ def nlp_nobn12d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
 
 def nlp_nobn22d(inc, kernel_size, stride, padding, win_norm=True, **kwargs):
 	return Pool2d(NOBN2_BASE, inc, kernel_size, stride, padding, win_norm, **kwargs)
+
+
+def attnpool2d(inc, stride, **kwargs):
+	return ATTNPOOL_BASE(inc, patch_size=stride)

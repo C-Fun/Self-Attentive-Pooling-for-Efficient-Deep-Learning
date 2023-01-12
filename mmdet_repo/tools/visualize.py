@@ -7,6 +7,7 @@ import warnings
 
 import cv2
 import numpy as np
+from tqdm import tqdm
 
 import torch
 import torch.nn as nn
@@ -28,10 +29,18 @@ from mmdet.datasets import (build_dataloader, build_dataset, get_loading_pipelin
 from mmdet.models import build_detector
 
 
-def visualize(model, loader, classes, show_dir, gpu_ids=[0], visual_type=['directly']):
+def visualize(model, data_loader, classes, img_list, show_dir, gpu_ids=[0], visual_type=['directly']):
+	with open(img_list, 'r') as f:
+		img_list = f.read()
+
+	img_list = list(map(lambda x: x.split('_')[0].strip(), img_list.split(',')))
+
+	print(img_list)
+
 	model = MMDataParallel(model, gpu_ids)
 	model.eval()
 	num_classes = len(classes)
+
 	def minmax(x):
 		return (x-np.min(x))/(1e-10+np.max(x)-np.min(x))
 
@@ -50,20 +59,22 @@ def visualize(model, loader, classes, show_dir, gpu_ids=[0], visual_type=['direc
 			module_list.append(module)
 
 
-	for i, data_dict in enumerate(loader):
-		img_metas = data_dict['img_metas'].data[0]
+	for i, data_dict in enumerate(tqdm(data_loader)):
+		# print(data_dict)
+		img_metas = data_dict['img_metas'][0].data[0]
 		img_name = img_metas[0]['filename'].split('/')[-1].split('.')[0]
 		# gt_bboxes = data_dict['gt_bboxes'].data[0][0]
 		# gt_labels = data_dict['gt_labels'].data[0][0]
 		# print('info:', img_name, gt_labels, gt_bboxes)
 
+		if img_name not in img_list:
+			continue
 
-		forward_dict = {'img': [data_dict['img'].data[0]], 'img_metas':[data_dict['img_metas'].data[0]]}
+		forward_dict = {'img': [data_dict['img'][0].data], 'img_metas':[data_dict['img_metas'][0].data[0]]}
 		with torch.no_grad():
 			result = model(return_loss=False, rescale=True, **forward_dict)
 
-
-		img = data_dict['img'].data[0][0,:,:,:].detach().cpu().numpy().transpose([1,2,0])
+		img = data_dict['img'][0].data[0,:,:,:].detach().cpu().numpy().transpose([1,2,0])
 		img = np.uint8(255 * minmax(img))
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 		(h,w,c) = img.shape
@@ -160,6 +171,11 @@ def parse_args():
 		default='none',
 		help='job launcher')
 	parser.add_argument('--local_rank', type=int, default=0)
+
+	parser.add_argument(
+		'--img_list',
+		type=str)
+
 	args = parser.parse_args()
 	if 'LOCAL_RANK' not in os.environ:
 		os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -192,7 +208,6 @@ def main():
 
 	cfg = Config.fromfile(args.config)
 
-
 	# init distributed env first, since logger depends on the dist info.
 	if args.launcher == 'none':
 		distributed = False
@@ -212,6 +227,11 @@ def main():
 		dist=distributed,
 		shuffle=False)
 
+	# print(cfg.data.val, dataset, data_loader)
+
+	# print(help(build_dataset))
+	# print(dataset, len(data_loader), data_loader.batch_size)
+
 	# build the model and load checkpoint
 	model = build_detector(cfg.model, train_cfg=cfg.get('train_cfg'), test_cfg=cfg.get('test_cfg'))
 	checkpoint = load_checkpoint(model, args.checkpoint, map_location='cpu')
@@ -224,7 +244,7 @@ def main():
 		model.CLASSES = dataset.CLASSES
 
 	gpu_ids = list(map(int, args.gpu_ids.split(',')))
-	visualize(model, data_loader, dataset.CLASSES, args.show_dir, gpu_ids)
+	visualize(model, data_loader, dataset.CLASSES, args.img_list, args.show_dir, gpu_ids)
 
 
 if __name__ == '__main__':

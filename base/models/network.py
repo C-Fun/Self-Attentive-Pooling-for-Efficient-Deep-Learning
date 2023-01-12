@@ -7,6 +7,8 @@ from .backbones.resnet_v2 import resnet18_v2, resnet50_v2
 from .backbones.resnet import resnet18, resnet50
 from .backbones.mobilenet import mobilenetv2 as mobilenetv2
 from .backbones.mobilenet_v2 import mobilenetv2 as mobilenetv2_v2
+from .backbones.mobilenetv3 import MobileNetV3_Small, MobileNetV3_Large
+from .backbones.resnext import resnext18
 
 from .utils.pool_models.common import *
 from .utils.dynamic_convs.dynamic_conv import Dynamic_conv2d
@@ -14,8 +16,12 @@ from .utils.dynamic_convs.dynamic_conv import Dynamic_conv2d
 def name_parse(name):
     cfg = None
     resnet_tpls = ('resnet18', 'resnet18_v2', 'resnet50', 'resnet50_v2')
+    resnext_tpls = ('resnext', 'resnext_v2')
     mobilenet_tpls = ('mobilenet', 'mobilenet_v2')
-    sota_pool_tpls = ('skip', 'maxp', 'avgp', 'lip', 'gaussian_pool')
+    mobilenetv3_small_tpls = ('mobilenetv3_small', 'mobilenetv3_small_v2')
+    mobilenetv3_large_tpls = ('mobilenetv3_large', 'mobilenetv3_large_v2')
+
+    sota_pool_tpls = ('skip', 'maxp', 'avgp', 'lip', 'gaussian_pool', 'attnpool')
     my_pool_tpls = ('nlp', 'dfmnlp', 'mixp', 'dfmixp', 'nlpnoexp', 'nlpnosigmoid', 'nlpnope', 'nlpnobn1', 'nlpnobn2')
 
     name_list = name.split('-')
@@ -134,6 +140,40 @@ def name_parse(name):
                     pool_dict('skip', s6) if s6==1 else pool_dict(_ptype, s6, ps=1, rt=1, nh=64, ct=_ctype, wn=True),
                     pool_dict('skip', s7) if s7==1 else pool_dict(_ptype, s7, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
                 )
+        elif len(strides)==11:
+            s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11 = strides
+            pdicts = (
+                pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=1, rt=1, nh=2, ct=_ctype, wn=True),
+                pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=1, rt=1, nh=4, ct=_ctype, wn=True),
+                pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=1, rt=1, nh=8, ct=_ctype, wn=True),
+                pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=1, rt=1, nh=16, ct=_ctype, wn=True),
+                pool_dict('skip', s5) if s5==1 else pool_dict(_ptype, s5, ps=1, rt=1, nh=32, ct=_ctype, wn=True),
+                pool_dict('skip', s6) if s6==1 else pool_dict(_ptype, s6, ps=1, rt=1, nh=64, ct=_ctype, wn=True),
+                pool_dict('skip', s7) if s7==1 else pool_dict(_ptype, s7, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s8) if s8==1 else pool_dict(_ptype, s8, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s9) if s9==1 else pool_dict(_ptype, s9, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s10) if s10==1 else pool_dict(_ptype, s10, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s11) if s11==1 else pool_dict(_ptype, s11, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+            )
+        elif len(strides)==15:
+            s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13, s14, s15 = strides
+            pdicts = (
+                pool_dict('skip', s1) if s1==1 else pool_dict(_ptype, s1, ps=1, rt=1, nh=2, ct=_ctype, wn=True),
+                pool_dict('skip', s2) if s2==1 else pool_dict(_ptype, s2, ps=1, rt=1, nh=4, ct=_ctype, wn=True),
+                pool_dict('skip', s3) if s3==1 else pool_dict(_ptype, s3, ps=1, rt=1, nh=8, ct=_ctype, wn=True),
+                pool_dict('skip', s4) if s4==1 else pool_dict(_ptype, s4, ps=1, rt=1, nh=16, ct=_ctype, wn=True),
+                pool_dict('skip', s5) if s5==1 else pool_dict(_ptype, s5, ps=1, rt=1, nh=32, ct=_ctype, wn=True),
+                pool_dict('skip', s6) if s6==1 else pool_dict(_ptype, s6, ps=1, rt=1, nh=64, ct=_ctype, wn=True),
+                pool_dict('skip', s7) if s7==1 else pool_dict(_ptype, s7, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s8) if s8==1 else pool_dict(_ptype, s8, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s9) if s9==1 else pool_dict(_ptype, s9, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s10) if s10==1 else pool_dict(_ptype, s10, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s11) if s11==1 else pool_dict(_ptype, s11, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s12) if s12==1 else pool_dict(_ptype, s12, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s13) if s13==1 else pool_dict(_ptype, s13, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s14) if s14==1 else pool_dict(_ptype, s14, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+                pool_dict('skip', s15) if s15==1 else pool_dict(_ptype, s15, ps=1, rt=1, nh=128, ct=_ctype, wn=True),
+            )
         if 'headfix2' in pool_str:
             for _pd in pdicts:
                 _pd['_num_heads'] = 2
@@ -196,6 +236,99 @@ def name_parse(name):
         cfg['layer7'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[6]}
         cfg['conv2'] = {'_conv2d':_ctype, 'pool_cfg': {}}
 
+    elif _arch in mobilenetv3_small_tpls:
+        assert len(strides)==11
+        cfg = {
+            'arch': _arch,
+            'conv1': None,
+            'layer1': None,
+            'layer2': None,
+            'layer3': None,
+            'layer4': None,
+            'layer5': None,
+            'layer6': None,
+            'layer7': None,
+            'layer8': None,
+            'layer9': None,
+            'layer10': None,
+            'layer11': None,
+        }
+
+        if prepool:
+            cfg['conv1'] = {'_conv2d':_ctype, 'pool_cfg': pre_pdict}
+        else:
+            cfg['conv1'] = {'_conv2d':_ctype, 'pool_cfg': pool_dict('skip', 2)}
+
+        cfg['layer1'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[0]}
+        cfg['layer2'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[1]}
+        cfg['layer3'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[2]}
+        cfg['layer4'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[3]}
+        cfg['layer5'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[4]}
+        cfg['layer6'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[5]}
+        cfg['layer7'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[6]}
+        cfg['layer8'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[7]}
+        cfg['layer9'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[8]}
+        cfg['layer10'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[9]}
+        cfg['layer11'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[10]}
+
+    elif _arch in mobilenetv3_large_tpls:
+        assert len(strides)==15
+        cfg = {
+            'arch': _arch,
+            'conv1': None,
+            'layer1': None,
+            'layer2': None,
+            'layer3': None,
+            'layer4': None,
+            'layer5': None,
+            'layer6': None,
+            'layer7': None,
+            'layer8': None,
+            'layer9': None,
+            'layer10': None,
+            'layer11': None,
+            'layer12': None,
+            'layer13': None,
+            'layer14': None,
+            'layer15': None,
+        }
+
+        if prepool:
+            cfg['conv1'] = {'_conv2d':_ctype, 'pool_cfg': pre_pdict}
+        else:
+            cfg['conv1'] = {'_conv2d':_ctype, 'pool_cfg': pool_dict('skip', 2)}
+
+        cfg['layer1'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[0]}
+        cfg['layer2'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[1]}
+        cfg['layer3'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[2]}
+        cfg['layer4'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[3]}
+        cfg['layer5'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[4]}
+        cfg['layer6'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[5]}
+        cfg['layer7'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[6]}
+        cfg['layer8'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[7]}
+        cfg['layer9'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[8]}
+        cfg['layer10'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[9]}
+        cfg['layer11'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[10]}
+        cfg['layer12'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[11]}
+        cfg['layer13'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[12]}
+        cfg['layer14'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[13]}
+        cfg['layer15'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[14]}
+
+    elif _arch in resnext_tpls:
+        assert len(strides)==4
+        cfg = {
+            'arch': _arch,
+            'layer1': None,
+            'layer2': None,
+            'layer3': None,
+            'layer4': None,
+        }
+
+        cfg['layer1'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[0]}
+        cfg['layer2'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[1]}
+        cfg['layer3'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[2]}
+        cfg['layer4'] = {'_conv2d':_ctype, 'pool_cfg': pdicts[3]}
+
     else:
         raise Exception("Undefined BackBone Type!")
 
@@ -235,6 +368,8 @@ def pool2d(_ptype):
         return nlp_nobn12d
     elif _ptype=='nlpnobn2':
         return nlp_nobn22d
+    elif _ptype=='attnpool':
+        return attnpool2d
     else:
         raise Exception("Undefined Pooling Type!")
 
@@ -302,6 +437,12 @@ class Network(nn.Module):
             self.net = mobilenetv2(cfg, pth_file=pth_file, **kwargs)
         elif arch == 'mobilenet_v2':
             self.net = mobilenetv2_v2(cfg, pth_file=pth_file, **kwargs)
+        elif arch == 'mobilenetv3_small':
+            self.net = MobileNetV3_Small(cfg, **kwargs)
+        elif arch == 'mobilenetv3_large':
+            self.net = MobileNetV3_Large(cfg, **kwargs)
+        elif arch == 'resnext':
+            self.net = resnext18(cfg, **kwargs)
         else:
             raise Exception("Undefined Backbone Type!")
 
