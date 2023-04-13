@@ -1,0 +1,16 @@
+*.zip
+*.pyc
+*.pth
+
+/.idea/
+/check_points/
+
+/pruning/
+/work_dirs/
+
+/base/logs_new/
+/base/trained_models_ann/
+/base/visualization/
+/base/models/configs/
+
+/mmdet_repo/visualization/

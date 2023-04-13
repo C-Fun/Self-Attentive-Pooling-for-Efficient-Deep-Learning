@@ -50,13 +50,13 @@ Architecture example:
 [Non-Local-Pooling/]
 > cd base
 [Non-Local-Pooling/base/]
-> python ann.py --dataset STL10 --batch_size 8 --architecture RESNET18-SKIP-1222 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+> python ann.py --dataset STL10 --batch_size 8 --architecture mobilenet_v2-nlp_headfix2-1222121 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+> python ann.py --dataset STL10 --batch_size 8 --architecture mobilenet_v2-nlp_headfix2-2222121 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+> python ann.py --dataset STL10 --batch_size 8 --architecture mobilenet_v2-nlp_headfix2-4222121 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
 
-> python ann.py --dataset STL10 --batch_size 8 --architecture PREPOOL-NLP_HEADFIX2-4-RESNET18-SKIP-1222 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
-
-> python ann.py --dataset STL10 --batch_size 8 --architecture MOBILENET-SKIP-1222121 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
-
-> python ann.py --dataset STL10 --batch_size 8 --architecture MOBILENET_v2-GAUSSIAN_POOL-1222121 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+> python ann.py --dataset STL10 --batch_size 8 --architecture resnet18-nlp-1222 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+> python ann.py --dataset STL10 --batch_size 8 --architecture resnet18-nlp_headfix2-2222 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
+> python ann.py --dataset STL10 --batch_size 8 --architecture resnet18-nlp_headfix2-4222 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
 ```
 
 ## MMDetection
@@ -91,8 +91,12 @@ Then, run the shell file as follows:
 ```shell
 [Non-Local-Pooling/]
 # single-gpu
-> sh mmdet_train.sh ./mmdet_repo/configs/network/faster_rcnn/dyresnet50.py
+> sh mmdet_train.sh ./mmdet_repo/configs/network/faster_rcnn/resnet18/resnet18-nlp.py
+> sh mmdet_train.sh ./mmdet_repo/configs/network/faster_rcnn/resnet18/resnet18-nlp_reduced.py
+> sh mmdet_train.sh ./mmdet_repo/configs/network/ssd/resnet18/ssd_resnet18-nlp-1222.py
+> sh mmdet_train.sh ./mmdet_repo/configs/network/ssd/mobilenet/nlp-1222121.py
+
 # multi-gpu
-> sh mmdet_dist_train.sh ./mmdet_repo/configs/network/faster_rcnn/dyresnet50.py 4
+> sh mmdet_dist_train.sh ./mmdet_repo/configs/network/faster_rcnn/resnet18.py 4
 ```
 
