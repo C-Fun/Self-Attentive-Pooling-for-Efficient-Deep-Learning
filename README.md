@@ -1,6 +1,6 @@
 # Self-Attentive Pooling for Efficient Deep Learning
 
-
+Official PyTorch implementation of the paper entitled 'Self-Attentive-Pooling-for-Efficient-Deep-Learning'.
 
 ## Image Recognition
 
@@ -100,3 +100,25 @@ Then, run the shell file as follows:
 > sh mmdet_dist_train.sh ./mmdet_repo/configs/network/faster_rcnn/resnet18.py 4
 ```
 
+## Citation
+
+If you find this work useful for your research, please cite our [paper](https://www.computer.org/csdl/proceedings-article/wacv/2023/934600d963/1L6LypkixNe):
+
+```
+@INPROCEEDINGS {10030316,
+author = {F. Chen and G. Datta and S. Kundu and P. A. Beerel},
+booktitle = {2023 IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)},
+title = {Self-Attentive Pooling for Efficient Deep Learning},
+year = {2023},
+volume = {},
+issn = {},
+pages = {3963-3972},
+abstract = {Efficient custom pooling techniques that can aggressively trim the dimensions of a feature map for resource-constrained computer vision applications have recently gained significant traction. However, prior pooling works extract only the local context of the activation maps, limiting their effectiveness. In contrast, we propose a novel non-local self-attentive pooling method that can be used as a drop-in replacement to the standard pooling layers, such as max/average pooling or strided convolution. The proposed self-attention module uses patch embedding, multihead self-attention, and spatial-channel restoration, followed by sigmoid activation and exponential soft-max. This self-attention mechanism efficiently aggregates dependencies between non-local activation patches during downsampling. Extensive experiments on standard object classification and detection tasks with various convolutional neural network (CNN) architectures demonstrate the superiority of our proposed mechanism over the state-of-the-art (SOTA) pooling techniques. In particular, we surpass the test accuracy of existing pooling techniques on different variants of MobileNet-V2 on ImageNet by an average of ~1.2%. With the aggressive down-sampling of the activation maps in the initial layers (providing up to 22x reduction in memory consumption), our approach achieves 1.43% higher test accuracy compared to SOTA techniques with iso-memory footprints. This enables the deployment of our models in memory-constrained devices, such as micro-controllers (without losing significant accuracy), because the initial activation maps consume a significant amount of on-chip memory for high-resolution images required for complex vision tasks. Our pooling method also leverages channel pruning to further reduce memory footprints. Codes are available at https://github.com/CFun/Non-Local-Pooling.},
+keywords = {deep learning;computer vision;limiting;memory management;feature extraction;system-on-chip;image restoration},
+doi = {10.1109/WACV56688.2023.00396},
+url = {https://doi.ieeecomputersociety.org/10.1109/WACV56688.2023.00396},
+publisher = {IEEE Computer Society},
+address = {Los Alamitos, CA, USA},
+month = {jan}
+}
+```
