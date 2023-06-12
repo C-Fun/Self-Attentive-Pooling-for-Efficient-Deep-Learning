@@ -4,6 +4,7 @@
 
 /.idea/
 /.backup/
+/base/demos.sh
 /check_points/
 
 /pruning/
