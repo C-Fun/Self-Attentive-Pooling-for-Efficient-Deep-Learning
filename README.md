@@ -1,6 +1,6 @@
 # Self-Attentive Pooling for Efficient Deep Learning
 
-Official PyTorch implementation of the paper entitled 'Self-Attentive-Pooling-for-Efficient-Deep-Learning'.
+Official PyTorch implementation of the paper entitled 'Self Attentive Pooling for Efficient Deep Learning'.
 
 ## Image Recognition
 
