@@ -19,14 +19,14 @@ import numpy as np
 import json
 import pickle
 
-from pytorch_grad_cam import GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
-from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
-from pytorch_grad_cam.utils.image import show_cam_on_image
+# from pytorch_grad_cam import GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
+# from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+# from pytorch_grad_cam.utils.image import show_cam_on_image
 
 from models.network import Network, name_parse
 
 # root = 'E:/留学相关/研究/RPIXEL/' # Windows
-root = '/nas/home/fangc/' # Linux
+root = '/home/fchen905/' # Linux
 
 class AverageMeter(object):
 	"""Computes and stores the average and current value"""

@@ -9,7 +9,7 @@
 ```shell
 [base/ann.py]
 ...
-root = '/nas/home/fangc/' # specify your home root
+root = '/home/$username/' # specify your home root
 ```
 
 - create a 'data' folder at the home root
@@ -66,14 +66,14 @@ Architecture example:
 ```shell
 [mmdet_train.sh]
 #!/usr/bin/env bash
-MMDET_ROOT='/nas/home/fangc/mmdetection/' # set your mmdetection library path here
+MMDET_ROOT='/home/$username/mmdetection/' # set your mmdetection library path here
 ...
 ```
 
 ```shell
 [mmdet_dist_train.sh]
 #!/usr/bin/env bash
-MMDET_ROOT='/nas/home/fangc/mmdetection/' # set your mmdetection library path here
+MMDET_ROOT='/home/$username//mmdetection/' # set your mmdetection library path here
 ...
 ```
 
@@ -81,7 +81,7 @@ MMDET_ROOT='/nas/home/fangc/mmdetection/' # set your mmdetection library path he
 
 ```shell
 [mmdet_repo/configs/common/coco_detection.py]
-root = '/nas/home/fangc/' # specify your home root
+root = '/home/$username/' # specify your home root
 ...
 data_root = root + '/data/coco/'
 ```

@@ -3,6 +3,7 @@
 *.pth
 
 /.idea/
+/.backup/
 /check_points/
 
 /pruning/
