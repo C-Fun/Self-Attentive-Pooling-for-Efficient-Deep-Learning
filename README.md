@@ -20,7 +20,7 @@ home root
 |- |- cifar100
 |- |- stl10
 |- |- coco
-|- Non-Local-Pooling
+|- Self-Attentive-Pooling
 ```
 
 #### Architecture is specified by keywords: 
@@ -47,9 +47,9 @@ Architecture example:
 ###### Examples:
 
 ```shell
-[Non-Local-Pooling/]
+[Self-Attentive-Pooling/]
 > cd base
-[Non-Local-Pooling/base/]
+[Self-Attentive-Pooling/base/]
 > python ann.py --dataset STL10 --batch_size 8 --architecture mobilenet_v2-nlp_headfix2-1222121 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
 > python ann.py --dataset STL10 --batch_size 8 --architecture mobilenet_v2-nlp_headfix2-2222121 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
 > python ann.py --dataset STL10 --batch_size 8 --architecture mobilenet_v2-nlp_headfix2-4222121 --im_size 128 --learning_rate 1e-2 --epochs 300 --lr_interval '0.6 0.8 0.9' --lr_reduce 5 --optimizer SGD --dropout 0.2 --devices 0,1 --seed 0 --log
@@ -73,7 +73,7 @@ MMDET_ROOT='/home/$username/mmdetection/' # set your mmdetection library path he
 ```shell
 [mmdet_dist_train.sh]
 #!/usr/bin/env bash
-MMDET_ROOT='/home/$username//mmdetection/' # set your mmdetection library path here
+MMDET_ROOT='/home/$username/mmdetection/' # set your mmdetection library path here
 ...
 ```
 
@@ -89,7 +89,7 @@ data_root = root + '/data/coco/'
 Then, run the shell file as follows:
 
 ```shell
-[Non-Local-Pooling/]
+[Self-Attentive-Pooling/]
 # single-gpu
 > sh mmdet_train.sh ./mmdet_repo/configs/network/faster_rcnn/resnet18/resnet18-nlp.py
 > sh mmdet_train.sh ./mmdet_repo/configs/network/faster_rcnn/resnet18/resnet18-nlp_reduced.py
