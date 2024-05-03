@@ -1,5 +1,4 @@
-root = 'E:/留学相关/研究/' # windows
-# root = '/nas/home/fangc/' # linux
+root = '/nas/home/fangc/' # linux
 
 # The new config inherits a base config to highlight the necessary modification
 _base_ = root + '/mmdetection/configs/faster_rcnn/faster_rcnn_r50_fpn_1x_coco.py'
